@@ -54,24 +54,38 @@ class _LoginPageState extends State<Login> {
                   ),
                   const SizedBox(height: 30),
 
-                  // EMAIL
+// EMAIL FIELD - Styled exactly like PASSWORD field
                   TextFormField(
                     controller: emailController,
                     keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
+
                     decoration: const InputDecoration(
-                      labelText: 'EMAIL',
+                      labelText: "EMAIL ",
                       border: UnderlineInputBorder(),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your email';
                       }
-                      if (!value.contains('@')) {
-                        return 'Enter a valid email';
+
+                      final emailRegex = RegExp(
+                        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                        caseSensitive: false,
+                      );
+
+                      if (!emailRegex.hasMatch(value)) {
+                        return 'Please enter a valid email address';
                       }
+
+                      if (value.length > 254) {
+                        return 'Email address is too long';
+                      }
+
                       return null;
                     },
                   ),
+
                   const SizedBox(height: 20),
 
                   // PASSWORD
