@@ -1,7 +1,9 @@
-import 'package:dump/screens/products.dart';
 import 'package:flutter/material.dart';
-
-import 'home.dart'; // re-use ProductCard
+import 'home.dart';
+import 'products.dart';
+import 'cart_screen.dart' ;
+import 'cart.dart';
+import 'Universalcheckout.dart';
 
 class ProductListByCategoryPage extends StatelessWidget {
   final String categoryName;
@@ -27,8 +29,7 @@ class ProductListByCategoryPage extends StatelessWidget {
       )
           : GridView.builder(
         padding: const EdgeInsets.all(16),
-        gridDelegate:
-        const SliverGridDelegateWithFixedCrossAxisCount(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           mainAxisSpacing: 16,
           crossAxisSpacing: 16,
@@ -41,27 +42,39 @@ class ProductListByCategoryPage extends StatelessWidget {
           return ProductCard(
             product: product,
             onAddToCart: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('${product.name} added to cart'),
-                  backgroundColor: Colors.blue,
-                  behavior: SnackBarBehavior.floating,
-                  margin: const EdgeInsets.all(16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+              // Add to global cart
+              final existingIndex = cartItems.indexWhere(
+                      (item) => item.name == product.name);
+              if (existingIndex >= 0) {
+                cartItems[existingIndex].quantity++;
+              } else {
+                cartItems.add(CartItem(
+                  name: product.name,
+                  image: product.assetPath,
+                  price: product.price,
+                ));
+              }
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const CartScreen(),
                 ),
               );
             },
             onBuyNow: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Buying ${product.name}'),
-                  backgroundColor: Colors.orange,
-                  behavior: SnackBarBehavior.floating,
-                  margin: const EdgeInsets.all(16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+              // Directly go to checkout
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => UniversalCheckout(
+                    checkoutItems: [
+                      CartItem(
+                        name: product.name,
+                        image: product.assetPath,
+                        price: product.price,
+                      )
+                    ],
                   ),
                 ),
               );

@@ -1,7 +1,5 @@
-// lib/screens/universal_checkout.dart
 import 'package:flutter/material.dart';
 import 'cart.dart';
-
 
 class UniversalCheckout extends StatefulWidget {
   final List<CartItem> checkoutItems;
@@ -14,7 +12,6 @@ class UniversalCheckout extends StatefulWidget {
 
 class _UniversalCheckoutState extends State<UniversalCheckout> {
   final _formKey = GlobalKey<FormState>();
-
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
@@ -32,11 +29,9 @@ class _UniversalCheckoutState extends State<UniversalCheckout> {
     super.dispose();
   }
 
-  // Email validation RegExp
   bool isValidEmail(String email) {
     final RegExp emailRegex = RegExp(
-        r"^[a-zA-Z0-9]+([._%+-]?[a-zA-Z0-9])*@[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+$"
-    );
+        r"^[a-zA-Z0-9]+([._%+-]?[a-zA-Z0-9])*@[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+$");
     return emailRegex.hasMatch(email);
   }
 
@@ -46,7 +41,7 @@ class _UniversalCheckoutState extends State<UniversalCheckout> {
     final double total = subtotal + shipping;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Confirm Order"), elevation: 0),
+      appBar: AppBar(title: const Text("Confirm Order")),
       body: Column(
         children: [
           Expanded(
@@ -59,7 +54,8 @@ class _UniversalCheckoutState extends State<UniversalCheckout> {
                   children: [
                     _sectionTitle("Personal Details"),
                     _buildTextField(_nameController, "Full Name", Icons.person),
-                    _buildTextField(_emailController, "Email", Icons.email,
+                    _buildTextField(
+                        _emailController, "Email", Icons.email,
                         keyboardType: TextInputType.emailAddress,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -69,9 +65,11 @@ class _UniversalCheckoutState extends State<UniversalCheckout> {
                           }
                           return null;
                         }),
-                    _buildTextField(_phoneController, "Phone Number", Icons.phone,
+                    _buildTextField(
+                        _phoneController, "Phone Number", Icons.phone,
                         keyboardType: TextInputType.phone),
-                    _buildTextField(_addressController, "Shipping Address", Icons.location_on,
+                    _buildTextField(
+                        _addressController, "Shipping Address", Icons.location_on,
                         maxLines: 3),
                     const SizedBox(height: 20),
                     _sectionTitle("Order Items"),
@@ -103,15 +101,13 @@ class _UniversalCheckoutState extends State<UniversalCheckout> {
     );
   }
 
-  // --- Helper Methods ---
   Widget _sectionTitle(String title) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 8.0),
     child: Text(title,
         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
   );
 
-  Widget _buildTextField(TextEditingController controller, String label,
-      IconData icon,
+  Widget _buildTextField(TextEditingController controller, String label, IconData icon,
       {int maxLines = 1,
         TextInputType keyboardType = TextInputType.text,
         String? Function(String?)? validator}) {
@@ -126,13 +122,12 @@ class _UniversalCheckoutState extends State<UniversalCheckout> {
           prefixIcon: Icon(icon),
           border: const OutlineInputBorder(),
         ),
-        validator: validator ??
-                (value) {
-              if (value == null || value.trim().isEmpty) {
-                return "Please enter $label";
-              }
-              return null;
-            },
+        validator: validator ?? (value) {
+          if (value == null || value.trim().isEmpty) {
+            return "Please enter $label";
+          }
+          return null;
+        },
       ),
     );
   }
@@ -156,27 +151,25 @@ class _UniversalCheckoutState extends State<UniversalCheckout> {
         ),
       );
 
-  Widget _buildConfirmButton(BuildContext context, double total) =>
-      Container(
-        padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-            color: Colors.white,
-            boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)]),
-        child: SafeArea(
-          child: SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange, padding: const EdgeInsets.all(16)),
-              onPressed: () => _showVerificationSheet(context),
-              child: Text("Pay ₹${total.toStringAsFixed(0)}",
-                  style: const TextStyle(fontSize: 18, color: Colors.white)),
-            ),
-          ),
+  Widget _buildConfirmButton(BuildContext context, double total) => Container(
+    padding: const EdgeInsets.all(20),
+    decoration: const BoxDecoration(
+        color: Colors.white,
+        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)]),
+    child: SafeArea(
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange, padding: const EdgeInsets.all(16)),
+          onPressed: () => _showVerificationSheet(context),
+          child: Text("Pay ₹${total.toStringAsFixed(0)}",
+              style: const TextStyle(fontSize: 18, color: Colors.white)),
         ),
-      );
+      ),
+    ),
+  );
 
-  // --- Creative Verification Bottom Sheet ---
   void _showVerificationSheet(BuildContext context) {
     if (_formKey.currentState?.validate() != true) return;
 
@@ -219,7 +212,8 @@ class _UniversalCheckoutState extends State<UniversalCheckout> {
               const SizedBox(height: 20),
               Card(
                 elevation: 2,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
@@ -243,7 +237,8 @@ class _UniversalCheckoutState extends State<UniversalCheckout> {
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   backgroundColor: Colors.green,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
                 ),
                 child: const Text(
                   "Confirm Order",
@@ -262,7 +257,10 @@ class _UniversalCheckoutState extends State<UniversalCheckout> {
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(width: 80, child: Text("$label:", style: const TextStyle(fontWeight: FontWeight.bold))),
+        SizedBox(
+            width: 80,
+            child:
+            Text("$label:", style: const TextStyle(fontWeight: FontWeight.bold))),
         Expanded(child: Text(value)),
       ],
     ),
@@ -278,7 +276,10 @@ class _UniversalCheckoutState extends State<UniversalCheckout> {
             "Thank you ${_nameController.text}!\n\nYour order will be delivered to:\n${_addressController.text}"),
         actions: [
           TextButton(
-              onPressed: () => Navigator.popUntil(context, (r) => r.isFirst),
+              onPressed: () {
+                cartItems.clear(); // clear cart after order
+                Navigator.popUntil(context, (r) => r.isFirst);
+              },
               child: const Text("Home"))
         ],
       ),

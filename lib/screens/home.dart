@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'Universalcheckout.dart';
 import 'cart.dart';
+import 'cart_screen.dart';
 import 'products.dart';
-
+import 'Universalcheckout.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -35,16 +35,6 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _showSnackBar(String message, Color color) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: color,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +56,10 @@ class _HomePageState extends State<HomePage> {
                 hintText: 'Search Products',
                 filled: true,
                 fillColor: Colors.grey[100],
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide.none),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide.none
+                ),
               ),
             ),
           ),
@@ -90,9 +83,29 @@ class _HomePageState extends State<HomePage> {
                 final product = _filteredProducts[index];
                 return ProductCard(
                   product: product,
-                  onAddToCart: () => _showSnackBar('${product.name} added to cart', Colors.blue),
+                  onAddToCart: () {
+
+                    final existingItem = cartItems.firstWhere(
+                          (item) => item.name == product.name,
+                      orElse: () => CartItem(name: '', image: '', price: 0),
+                    );
+
+                    if (existingItem.name.isEmpty) {
+                      cartItems.add(CartItem(
+                        name: product.name,
+                        image: product.assetPath,
+                        price: product.price,
+                        quantity: 1,
+                      ));
+                    } else {
+                      existingItem.quantity++;
+                    }
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const CartScreen()),
+                    );
+                  },
                   onBuyNow: () {
-                    // --- CONNECTED TO UNIVERSAL CHECKOUT ---
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -118,8 +131,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-// --- PRODUCT CARD COMPONENT ---
 class ProductCard extends StatelessWidget {
   final Product product;
   final VoidCallback onAddToCart;
@@ -144,7 +155,11 @@ class ProductCard extends StatelessWidget {
               aspectRatio: 1,
               child: Hero(
                 tag: product.name,
-                child: Image.asset(product.assetPath, fit: BoxFit.cover, errorBuilder: (c, e, s) => const Icon(Icons.image)),
+                child: Image.asset(
+                  product.assetPath,
+                  fit: BoxFit.cover,
+                  errorBuilder: (c, e, s) => const Icon(Icons.image),
+                ),
               ),
             ),
             Padding(
@@ -183,8 +198,6 @@ class ProductCard extends StatelessWidget {
     );
   }
 }
-
-// --- PRODUCT DETAIL SCREEN ---
 class ProductDetailScreen extends StatelessWidget {
   final Product product;
   const ProductDetailScreen({super.key, required this.product});
@@ -218,7 +231,6 @@ class ProductDetailScreen extends StatelessWidget {
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(backgroundColor: Colors.orange, padding: const EdgeInsets.symmetric(vertical: 16)),
           onPressed: () {
-            // --- CONNECTED TO UNIVERSAL CHECKOUT ---
             Navigator.push(
               context,
               MaterialPageRoute(
