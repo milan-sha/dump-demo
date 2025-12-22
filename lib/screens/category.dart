@@ -57,11 +57,11 @@ class _CategoryScreenState extends State<CategoryScreen> {
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.blue,
         title: const Text(
           'Explore Categories',
           style: TextStyle(
-            color: Colors.black,
+            color: Colors.white,
             fontWeight: FontWeight.w600,
             fontSize: 20,
           ),

@@ -39,7 +39,7 @@ class _CartPageState extends State<CartScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("My Cart"),
-        centerTitle: true,
+
         elevation: 0,
       ),
       body: cartItems.isEmpty
