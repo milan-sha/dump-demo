@@ -24,16 +24,7 @@ class CartScreen extends StatefulWidget {
 
 class _CartPageState extends State<CartScreen> {
   final List<CartItem> cartItems = [
-    CartItem(
-      name: "bag",
-      image: "assets/greenbag.jpg",
-      price: 500,
-    ),
-    CartItem(
-      name: "shoe",
-      image: "assets/red shoe.jpg",
-      price: 2000,
-    ),
+
   ];
 
   double get totalPrice {

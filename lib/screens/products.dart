@@ -1,4 +1,3 @@
-// lib/products.dart - SIMPLIFIED (No discount/reviews)
 class Product {
   final String id;
   final String name;
@@ -20,7 +19,7 @@ class Product {
 }
 
 const List<Product> allProducts = [
-  const Product(
+  Product(
     id: '1',
     name: 'Nike Air Max 90 Black',
     price: 4999,
@@ -28,7 +27,7 @@ const List<Product> allProducts = [
     category: 'Shoes',
     description: 'Premium running shoes with maximum cushioning and breathable mesh upper.',
   ),
-  const Product(
+  Product(
     id: '2',
     name: 'Nike Air Force 1 Red',
     price: 5999,
@@ -36,7 +35,7 @@ const List<Product> allProducts = [
     category: 'Shoes',
     description: 'Classic lifestyle sneakers in vibrant red colorway.',
   ),
-  const Product(
+  Product(
     id: '3',
     name: 'Organic Face Cream',
     price: 899,
@@ -44,7 +43,7 @@ const List<Product> allProducts = [
     category: 'Cosmetics',
     description: 'Natural moisturizer with vitamin C & hyaluronic acid for glowing skin.',
   ),
-  const Product(
+  Product(
     id: '4',
     name: 'Nordic Wooden Chair',
     price: 2999,
@@ -52,7 +51,7 @@ const List<Product> allProducts = [
     category: 'Furniture',
     description: 'Minimalist oak wood dining chair with modern design.',
   ),
-  const Product(
+  Product(
     id: '5',
     name: 'Eco Leather Green Bag',
     price: 1299,
@@ -60,9 +59,9 @@ const List<Product> allProducts = [
     category: 'Fashion',
     description: 'Sustainable vegan leather crossbody bag with premium finish.',
   ),
-  const Product(
+  Product(
     id: '6',
-    name: 'Glass Water Bottle',
+    name: 'Green Water Bottle',
     price: 399,
     assetPath: 'assets/bottle.jpg',
     category: 'Fashion',

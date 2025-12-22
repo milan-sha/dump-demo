@@ -14,7 +14,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
   late List<Product> _filteredProducts;
-  String _searchQuery = '';
 
   @override
   void initState() {
@@ -30,7 +29,6 @@ class _HomePageState extends State<HomePage> {
 
   void _filterProducts(String query) {
     setState(() {
-      _searchQuery = query;
       _filteredProducts = allProducts
           .where((p) => p.name.toLowerCase().contains(query.toLowerCase()))
           .toList();

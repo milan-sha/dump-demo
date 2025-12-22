@@ -1,4 +1,3 @@
-// lib/screens/account_screen.dart
 import 'package:flutter/material.dart';
 import 'login.dart';
 
@@ -243,7 +242,6 @@ class AccountScreen extends StatelessWidget {
             ? const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey)
             : null,
         onTap: () {
-          // TODO: Navigate to each detail page
         },
       ),
     );

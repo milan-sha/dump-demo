@@ -1,4 +1,4 @@
-// lib/screens/login.dart
+
 import 'package:flutter/material.dart';
 
 import 'main.dart';
@@ -53,8 +53,6 @@ class _LoginPageState extends State<Login> {
                     style: TextStyle(color: Colors.grey),
                   ),
                   const SizedBox(height: 30),
-
-// EMAIL FIELD - Styled exactly like PASSWORD field
                   TextFormField(
                     controller: emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -87,8 +85,6 @@ class _LoginPageState extends State<Login> {
                   ),
 
                   const SizedBox(height: 20),
-
-                  // PASSWORD
                   TextFormField(
                     controller: passwordController,
                     obscureText: !isPasswordVisible,
@@ -126,8 +122,6 @@ class _LoginPageState extends State<Login> {
                   ),
 
                   const SizedBox(height: 10),
-
-                  // LOGIN BUTTON
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
