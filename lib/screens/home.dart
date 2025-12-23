@@ -40,7 +40,8 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dump', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
+        title: const Text('Dump', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)
+        ),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,8 +68,6 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Text('${_filteredProducts.length} Products', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
           ),
-
-          // GRID
           Expanded(
             child: GridView.builder(
               padding: const EdgeInsets.all(16),
@@ -201,7 +200,6 @@ class ProductCard extends StatelessWidget {
 class ProductDetailScreen extends StatelessWidget {
   final Product product;
   const ProductDetailScreen({super.key, required this.product});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -5,7 +5,7 @@ import 'category.dart';
 import 'account.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  const MainScreen({super.key, required Widget child});
 
   @override
   State<MainScreen> createState() => _MainScreenState();

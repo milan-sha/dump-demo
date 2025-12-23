@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'Universalcheckout.dart';
+import 'package:go_router/go_router.dart';
 import 'cart.dart';
 
 
@@ -37,8 +37,10 @@ class _CartPageState extends State<CartScreen> {
               itemBuilder: (context, index) {
                 final item = cartItems[index];
                 return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  margin: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 8),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
                   child: Padding(
                     padding: const EdgeInsets.all(12),
                     child: Row(
@@ -48,8 +50,8 @@ class _CartPageState extends State<CartScreen> {
                           width: 70,
                           height: 70,
                           fit: BoxFit.cover,
-                          errorBuilder: (c, e, s) =>
-                          const Icon(Icons.image_not_supported, size: 70),
+                          errorBuilder: (c, e, s) => const Icon(
+                              Icons.image_not_supported, size: 70),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -58,7 +60,8 @@ class _CartPageState extends State<CartScreen> {
                             children: [
                               Text(item.name,
                                   style: const TextStyle(
-                                      fontSize: 16, fontWeight: FontWeight.bold)),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold)),
                               const SizedBox(height: 6),
                               Text("₹${item.price.toStringAsFixed(0)}"),
                             ],
@@ -87,7 +90,8 @@ class _CartPageState extends State<CartScreen> {
                           ],
                         ),
                         IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
+                          icon:
+                          const Icon(Icons.delete, color: Colors.red),
                           onPressed: () {
                             setState(() {
                               cartItems.removeAt(index);
@@ -113,8 +117,8 @@ class _CartPageState extends State<CartScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text("Total",
-                        style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
                     Text("₹${totalPrice.toStringAsFixed(0)}",
                         style: const TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),
@@ -127,15 +131,12 @@ class _CartPageState extends State<CartScreen> {
                   child: ElevatedButton(
                     onPressed: () {
                       if (cartItems.isEmpty) return;
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              UniversalCheckout(checkoutItems: cartItems),
-                        ),
-                      );
+
+                      // Navigate to checkout page with cartItems
+                      context.push('/checkout', extra: cartItems);
                     },
-                    child: const Text("Checkout", style: TextStyle(fontSize: 16)),
+                    child: const Text("Checkout",
+                        style: TextStyle(fontSize: 16)),
                   ),
                 ),
               ],

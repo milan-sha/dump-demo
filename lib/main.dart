@@ -1,23 +1,23 @@
-
 import 'package:flutter/material.dart';
-import 'screens/login.dart';
+import 'routes.dart';
 
-void main() => runApp(const MainApp());
+void main() {
+  runApp(const MyApp());
+}
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Dump',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: const Color(0xFFF5F5F5),
-        useMaterial3: false,
       ),
-      home: const Login(),
-      debugShowCheckedModeBanner: false,
+      routerConfig: appRouter, // Use router from routes.dart
     );
   }
 }

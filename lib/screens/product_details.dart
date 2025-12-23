@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'cart.dart';
 import 'products.dart';
 
 class ProductDetailScreen extends StatelessWidget {
   final Product product;
+
   const ProductDetailScreen({super.key, required this.product});
 
+  // Add to cart function
   void _addToCart(BuildContext context) {
     final existingIndex =
     cartItems.indexWhere((item) => item.name == product.name);
@@ -51,7 +54,7 @@ class ProductDetailScreen extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -69,9 +72,10 @@ class ProductDetailScreen extends StatelessWidget {
                       style:
                       TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
-                  const Text(
-                      "Premium quality product from Dump. Durable and modern design. Perfect for your daily needs with high-performance materials.",
-                      style: TextStyle(
+                  Text(product.description.isNotEmpty
+                      ? product.description
+                      : "Premium quality product from Dump. Durable and modern design. Perfect for your daily needs with high-performance materials.",
+                      style: const TextStyle(
                           fontSize: 16, color: Colors.grey, height: 1.5)),
                   const SizedBox(height: 100),
                 ],
@@ -81,7 +85,7 @@ class ProductDetailScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: const [
@@ -90,18 +94,50 @@ class ProductDetailScreen extends StatelessWidget {
           ],
         ),
         child: SafeArea(
-          child: OutlinedButton(
-            onPressed: () => _addToCart(context),
-            style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Colors.blue, width: 2),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12))),
-            child: const Text("ADD TO CART",
-                style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue)),
+          child: Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => _addToCart(context),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Colors.blue, width: 2),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: const Text("ADD TO CART",
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue)),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Go to checkout page with only this product
+                    context.push('/checkout', extra: [
+                      CartItem(
+                        name: product.name,
+                        image: product.assetPath,
+                        price: product.price,
+                        quantity: 1,
+                      )
+                    ]);
+                  },
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12))),
+                  child: const Text(
+                    "BUY NOW",
+                    style: TextStyle(fontSize: 14, color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

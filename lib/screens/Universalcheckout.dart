@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'cart.dart';
 
 class UniversalCheckout extends StatefulWidget {
@@ -276,11 +277,13 @@ class _UniversalCheckoutState extends State<UniversalCheckout> {
             "Thank you ${_nameController.text}!\n\nYour order will be delivered to:\n${_addressController.text}"),
         actions: [
           TextButton(
-              onPressed: () {
-                cartItems.clear(); // clear cart after order
-                Navigator.popUntil(context, (r) => r.isFirst);
-              },
-              child: const Text("Home"))
+            onPressed: () {
+              cartItems.clear();
+              context.go('/home');
+            },
+            child: const Text("Home"),
+          )
+
         ],
       ),
     );

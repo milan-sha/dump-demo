@@ -1,8 +1,5 @@
-
 import 'package:flutter/material.dart';
-
-import 'main.dart';
-
+import 'package:go_router/go_router.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -24,11 +21,18 @@ class _LoginPageState extends State<Login> {
     super.dispose();
   }
 
+  void _login() {
+    if (formKey.currentState!.validate()) {
+      // Navigate to home (MainScreen) using GoRouter
+      context.go('/home');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Center(
           child: SingleChildScrollView(
             child: Form(
@@ -42,9 +46,7 @@ class _LoginPageState extends State<Login> {
                     "Welcome back",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 35,
-                      fontWeight: FontWeight.bold,
-                    ),
+                        fontSize: 35, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
                   const Text(
@@ -53,38 +55,29 @@ class _LoginPageState extends State<Login> {
                     style: TextStyle(color: Colors.grey),
                   ),
                   const SizedBox(height: 30),
+
+                  // Email Field
                   TextFormField(
                     controller: emailController,
                     keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.next,
-
                     decoration: const InputDecoration(
-                      labelText: "EMAIL ",
-                      border: UnderlineInputBorder(),
-                    ),
+                        labelText: "EMAIL", border: UnderlineInputBorder()),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your email';
                       }
-
                       final emailRegex = RegExp(
-                        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-                        caseSensitive: false,
-                      );
-
+                          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
                       if (!emailRegex.hasMatch(value)) {
                         return 'Please enter a valid email address';
                       }
-
-                      if (value.length > 254) {
-                        return 'Email address is too long';
-                      }
-
                       return null;
                     },
                   ),
 
                   const SizedBox(height: 20),
+
+                  // Password Field
                   TextFormField(
                     controller: passwordController,
                     obscureText: !isPasswordVisible,
@@ -113,6 +106,8 @@ class _LoginPageState extends State<Login> {
                     },
                   ),
 
+                  const SizedBox(height: 10),
+
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
@@ -121,55 +116,40 @@ class _LoginPageState extends State<Login> {
                     ),
                   ),
 
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 20),
+
+                  // Login Button
                   ElevatedButton(
+                    onPressed: _login,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    onPressed: () {
-                      if (formKey.currentState!.validate()) {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const MainScreen(),
-                          ),
-                        );
-                      }
-                    },
+                        backgroundColor: Colors.blue,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8))),
                     child: const Text(
                       "Login",
                       style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
                   ),
 
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 20),
 
+                  // Social Sign-In Buttons
                   OutlinedButton.icon(
                     onPressed: () {},
-                    icon: const Icon(
-                      Icons.facebook_outlined,
-                      color: Colors.blue,
-                    ),
+                    icon: const Icon(Icons.facebook_outlined, color: Colors.blue),
                     label: const Text("Sign in with Facebook"),
                   ),
-
                   const SizedBox(height: 10),
-
                   OutlinedButton.icon(
                     onPressed: () {},
-                    icon: const Icon(
-                      Icons.login,
-                      color: Colors.red,
-                    ),
+                    icon: const Icon(Icons.login, color: Colors.red),
                     label: const Text("Sign in with Google"),
                   ),
 
                   const SizedBox(height: 20),
 
+                  // Register link
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
