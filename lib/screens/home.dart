@@ -243,11 +243,13 @@ class ProductDetailScreen extends StatelessWidget {
                   ],
                 ),
               ),
+
             );
           },
           child: const Text("Buy Now", style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
         ),
       ),
+
     );
   }
 }
