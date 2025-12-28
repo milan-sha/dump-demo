@@ -175,7 +175,7 @@ class ProductCard extends StatelessWidget {
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
                           onPressed: onAddToCart,
-                          child: const Text('Cart', style: TextStyle(color: Colors.white, fontSize: 12)),
+                          child: const Text('Cart', style: TextStyle(color: Colors.white, fontSize: 7)),
                         ),
                       ),
                       const SizedBox(width: 4),
@@ -183,7 +183,7 @@ class ProductCard extends StatelessWidget {
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
                           onPressed: onBuyNow,
-                          child: const Text('Buy', style: TextStyle(color: Colors.white, fontSize: 12)),
+                          child: const Text('Buy', style: TextStyle(color: Colors.white, fontSize: 8)),
                         ),
                       ),
                     ],
@@ -225,9 +225,9 @@ class ProductDetailScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(15.0),
         child: ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.orange, padding: const EdgeInsets.symmetric(vertical: 16)),
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.orange, padding: const EdgeInsets.symmetric(vertical: 15)),
           onPressed: () {
             Navigator.push(
               context,
