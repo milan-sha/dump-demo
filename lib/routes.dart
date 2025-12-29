@@ -1,12 +1,12 @@
 import 'package:dump/screens/cart.dart';
-import 'package:dump/screens/home.dart';
 import 'package:dump/screens/main.dart';
+import 'package:dump/screens/product_details.dart';
 import 'package:dump/screens/products.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'screens/login.dart';
+import 'screens/login/login.dart';
 import 'screens/product_list_by_category.dart';
-import 'screens/Universalcheckout.dart';
+import 'screens/universalcheckout/Universalcheckout.dart';
 
 
 final GoRouter appRouter = GoRouter(

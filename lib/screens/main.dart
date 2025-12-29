@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'home.dart';
+import 'home/home.dart';
 import 'cart_screen.dart';
 import 'category.dart';
-import 'account.dart';
+import 'account/account.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key, required Widget child});

@@ -1,8 +1,10 @@
+import 'package:dump/screens/home/home_cubit/home_cubit.dart';
 import 'package:flutter/material.dart';
-import 'cart.dart';
-import 'cart_screen.dart';
-import 'products.dart';
-import 'Universalcheckout.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../cart.dart';
+import '../cart_screen.dart';
+import '../products.dart';
+import '../universalcheckout/Universalcheckout.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -35,12 +37,13 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dump', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)
+        title: const Text(
+          'Dump',
+          style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
         ),
       ),
       body: Column(
@@ -58,15 +61,18 @@ class _HomePageState extends State<HomePage> {
                 filled: true,
                 fillColor: Colors.grey[100],
                 border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide.none
+                  borderRadius: BorderRadius.circular(24),
+                  borderSide: BorderSide.none,
                 ),
               ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Text('${_filteredProducts.length} Products', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            child: Text(
+              '${_filteredProducts.length} Products',
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
           ),
           Expanded(
             child: GridView.builder(
@@ -83,41 +89,45 @@ class _HomePageState extends State<HomePage> {
                 return ProductCard(
                   product: product,
                   onAddToCart: () {
-
                     final existingItem = cartItems.firstWhere(
                           (item) => item.name == product.name,
                       orElse: () => CartItem(name: '', image: '', price: 0),
                     );
 
                     if (existingItem.name.isEmpty) {
-                      cartItems.add(CartItem(
-                        name: product.name,
-                        image: product.assetPath,
-                        price: product.price,
-                        quantity: 1,
-                      ));
+                      cartItems.add(
+                        CartItem(
+                          name: product.name,
+                          image: product.assetPath,
+                          price: product.price,
+                          quantity: 1,
+                        ),
+                      );
                     } else {
                       existingItem.quantity++;
                     }
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const CartScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => const CartScreen(),
+                      ),
                     );
                   },
                   onBuyNow: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => UniversalCheckout(
-                          checkoutItems: [
-                            CartItem(
-                              name: product.name,
-                              image: product.assetPath,
-                              price: product.price,
-                              quantity: 1,
+                        builder: (context) =>
+                            UniversalCheckout(
+                              checkoutItems: [
+                                CartItem(
+                                  name: product.name,
+                                  image: product.assetPath,
+                                  price: product.price,
+                                  quantity: 1,
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
                       ),
                     );
                   },
@@ -130,12 +140,18 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
 class ProductCard extends StatelessWidget {
   final Product product;
   final VoidCallback onAddToCart;
   final VoidCallback onBuyNow;
 
-  const ProductCard({super.key, required this.product, required this.onAddToCart, required this.onBuyNow});
+  const ProductCard({
+    super.key,
+    required this.product,
+    required this.onAddToCart,
+    required this.onBuyNow,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -145,7 +161,12 @@ class ProductCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => ProductDetailScreen(product: product)));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProductDetailScreen(product: product),
+            ),
+          );
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -166,24 +187,48 @@ class ProductCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(product.name, maxLines: 1, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                  Text('₹${product.price.toStringAsFixed(0)}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green)),
+                  Text(
+                    product.name,
+                    maxLines: 1,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    '₹${product.price.toStringAsFixed(0)}',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green,
+                    ),
+                  ),
                   const SizedBox(height: 8),
                   Row(
                     children: [
                       Expanded(
                         child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                          ),
                           onPressed: onAddToCart,
-                          child: const Text('Cart', style: TextStyle(color: Colors.white, fontSize: 7)),
+                          child: const Text(
+                            'Cart',
+                            style: TextStyle(color: Colors.white, fontSize: 7),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 4),
                       Expanded(
                         child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange,
+                          ),
                           onPressed: onBuyNow,
-                          child: const Text('Buy', style: TextStyle(color: Colors.white, fontSize: 8)),
+                          child: const Text(
+                            'Buy',
+                            style: TextStyle(color: Colors.white, fontSize: 8),
+                          ),
                         ),
                       ),
                     ],
@@ -197,9 +242,12 @@ class ProductCard extends StatelessWidget {
     );
   }
 }
+
 class ProductDetailScreen extends StatelessWidget {
   final Product product;
+
   const ProductDetailScreen({super.key, required this.product});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -207,18 +255,61 @@ class ProductDetailScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Hero(tag: product.name, child: Image.asset(product.assetPath, width: double.infinity, height: 350, fit: BoxFit.cover)),
+            Hero(
+              tag: product.name,
+              child: Image.asset(
+                product.assetPath,
+                width: double.infinity,
+                height: 350,
+                fit: BoxFit.cover,
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.all(20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(product.name, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
-                  Text('₹${product.price.toStringAsFixed(0)}', style: const TextStyle(fontSize: 24, color: Colors.green, fontWeight: FontWeight.w600)),
+                  Text(
+                    product.name,
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    '₹${product.price.toStringAsFixed(0)}',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      color: Colors.green,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                   const SizedBox(height: 20),
-                  const Text("About this product", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  const Text("Premium quality product. Durable and modern design.", style: TextStyle(fontSize: 16, color: Colors.grey)),
+                  const Text(
+                    "About this product",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const Text(
+                    "Premium quality product. Durable and modern design.",
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
                 ],
+              ),
+            ),
+
+            BlocProvider(
+              create: (context) => HomeCubit(),
+              child: BlocBuilder<HomeCubit, HomeState>(
+                builder: (context, state) {
+                  return Row(
+                    children: [
+                      Text(state.sumData.toString()),
+                      IconButton(icon: const Icon(Icons.add), onPressed: () {
+                        context.read<HomeCubit>().onTapCount();
+                      }),
+                    ],
+                  );
+                },
               ),
             ),
           ],
@@ -227,29 +318,38 @@ class ProductDetailScreen extends StatelessWidget {
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(15.0),
         child: ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.orange, padding: const EdgeInsets.symmetric(vertical: 15)),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.orange,
+            padding: const EdgeInsets.symmetric(vertical: 15),
+          ),
           onPressed: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => UniversalCheckout(
-                  checkoutItems: [
-                    CartItem(
-                      name: product.name,
-                      image: product.assetPath,
-                      price: product.price,
-                      quantity: 1,
+                builder: (context) =>
+                    UniversalCheckout(
+                      checkoutItems: [
+                        CartItem(
+                          name: product.name,
+                          image: product.assetPath,
+                          price: product.price,
+                          quantity: 1,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
               ),
-
             );
           },
-          child: const Text("Buy Now", style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+          child: const Text(
+            "Buy Now",
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
       ),
-
     );
   }
 }

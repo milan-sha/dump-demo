@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'cart.dart';
+import '../cart.dart'; // Ensure this file defines List<CartItem> cartItems
 
 class UniversalCheckout extends StatefulWidget {
   final List<CartItem> checkoutItems;
@@ -278,12 +278,12 @@ class _UniversalCheckoutState extends State<UniversalCheckout> {
         actions: [
           TextButton(
             onPressed: () {
+              // RESTORED: Clear the simple global list
               cartItems.clear();
               context.go('/home');
             },
             child: const Text("Home"),
           )
-
         ],
       ),
     );

@@ -1,3 +1,4 @@
+// lib/screens/cart.dart
 class CartItem {
   String name;
   String image;
@@ -12,6 +13,5 @@ class CartItem {
   });
 }
 
-// Sample cart items
-List<CartItem> cartItems = [
-];
+// THE GLOBAL LIST
+List<CartItem> cartItems = [];
