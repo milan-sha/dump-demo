@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_ce/hive_ce.dart';
 import 'package:go_router/go_router.dart';
-import 'account_cubit.dart';
-import 'account_state.dart';
+import 'account_cubit/account_cubit.dart';
+import 'account_cubit/account_state.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
