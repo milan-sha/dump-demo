@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hive_ce/hive_ce.dart'; // ✅ ADDED
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -23,7 +24,11 @@ class _LoginPageState extends State<Login> {
 
   void _login() {
     if (formKey.currentState!.validate()) {
-      // Navigate to home (MainScreen) using GoRouter
+      final box = Hive.box('userBox');
+
+      // ✅ SAVE USERNAME
+      box.put('username', emailController.text.trim());
+
       context.go('/home');
     }
   }
@@ -45,8 +50,7 @@ class _LoginPageState extends State<Login> {
                   const Text(
                     "Welcome back",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: 35, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
                   const Text(
@@ -56,12 +60,14 @@ class _LoginPageState extends State<Login> {
                   ),
                   const SizedBox(height: 30),
 
-                  // Email Field
+                  // EMAIL
                   TextFormField(
                     controller: emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(
-                        labelText: "EMAIL", border: UnderlineInputBorder()),
+                      labelText: "EMAIL",
+                      border: UnderlineInputBorder(),
+                    ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your email';
@@ -77,7 +83,7 @@ class _LoginPageState extends State<Login> {
 
                   const SizedBox(height: 20),
 
-                  // Password Field
+                  // PASSWORD
                   TextFormField(
                     controller: passwordController,
                     obscureText: !isPasswordVisible,
@@ -106,26 +112,17 @@ class _LoginPageState extends State<Login> {
                     },
                   ),
 
-                  const SizedBox(height: 10),
-
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {},
-                      child: const Text("Forgot my password"),
-                    ),
-                  ),
-
                   const SizedBox(height: 20),
 
-                  // Login Button
                   ElevatedButton(
                     onPressed: _login,
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8))),
+                      backgroundColor: Colors.blue,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
                     child: const Text(
                       "Login",
                       style: TextStyle(color: Colors.white, fontSize: 16),

@@ -1,7 +1,6 @@
 import 'package:hive_ce_flutter/adapters.dart';
-
 @HiveType(typeId: 0)
-class CartItem {
+class CartItem extends HiveObject { // Extend HiveObject for easier updates
   @HiveField(0)
   final String name;
 

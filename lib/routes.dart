@@ -7,7 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'screens/login/login.dart';
 import 'screens/product_list_by_category.dart';
 import 'screens/universalcheckout/Universalcheckout.dart';
-
+// 1. IMPORT YOUR CALENDAR SCREEN HERE
+// import 'package:dump/screens/calendar_page.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/login',
@@ -25,21 +26,27 @@ final GoRouter appRouter = GoRouter(
       routes: [
         GoRoute(
           path: '/home',
-          builder: (context, state) => const SizedBox(), // Home tab handled in MainScreen
+          builder: (context, state) => const SizedBox(),
         ),
         GoRoute(
           path: '/category',
-          builder: (context, state) => const SizedBox(), // Category tab handled in MainScreen
+          builder: (context, state) => const SizedBox(),
         ),
         GoRoute(
           path: '/cart',
-          builder: (context, state) => const SizedBox(), // Cart tab handled in MainScreen
+          builder: (context, state) => const SizedBox(),
         ),
         GoRoute(
           path: '/account',
-          builder: (context, state) => const SizedBox(), // Account tab handled in MainScreen
+          builder: (context, state) => const SizedBox(),
         ),
       ],
+    ),
+
+    // 2. ADD THE CALENDAR ROUTE
+    GoRoute(
+      path: '/calendar',
+      builder: (context, state) => const CalendarPage(), // Ensure this class exists
     ),
 
     // Category Products page
@@ -70,3 +77,16 @@ final GoRouter appRouter = GoRouter(
     ),
   ],
 );
+
+// Basic Placeholder for CalendarPage if you haven't created the file yet
+class CalendarPage extends StatelessWidget {
+  const CalendarPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Calendar")),
+      body: const Center(child: Text("Calendar Screen")),
+    );
+  }
+}
