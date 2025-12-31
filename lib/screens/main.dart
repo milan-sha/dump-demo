@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'home/home.dart';
 import 'cart_screen.dart';
-import 'category.dart';
+import ' category/category.dart';
 import 'account/account.dart';
 
 class MainScreen extends StatefulWidget {
@@ -37,7 +37,7 @@ class _MainScreenState extends State<MainScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(32),
-              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 18, offset: const Offset(0, 6))],
+              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 18, offset: const Offset(0, 6))],
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(32),
