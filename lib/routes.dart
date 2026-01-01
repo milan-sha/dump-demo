@@ -1,15 +1,14 @@
 import 'package:dump/screens/%20category/category.dart';
-import 'package:dump/screens/cart.dart';
-import 'package:dump/screens/universalcheckout.dart';
+import 'package:dump/screens/cart/cart.dart';
+import 'package:dump/screens/cart/cart_screen.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter/material.dart';
 import 'models/hive_products.dart';
 import 'screens/login/login.dart';
-import 'screens/home/home.dart';
-
+import 'screens/home/home.dart'; // Updated path for the new folder
 import 'screens/account/account.dart';
 import 'screens/product_details.dart';
-import 'screens/product_list_by_category.dart';
+import 'screens/ category/product_list_by_category.dart';
+import 'screens/universalcheckout.dart';
 import 'screens/main.dart';
 
 final GoRouter appRouter = GoRouter(
@@ -19,6 +18,8 @@ final GoRouter appRouter = GoRouter(
       path: '/login',
       builder: (context, state) => const Login(),
     ),
+
+    // Main App Shell (Contains Bottom Navigation)
     ShellRoute(
       builder: (context, state, child) {
         return MainScreen(child: child);
@@ -32,13 +33,19 @@ final GoRouter appRouter = GoRouter(
           path: '/category',
           builder: (context, state) => const CategoryScreen(),
         ),
-
+        // ADDED: Cart route inside the Shell
+        GoRoute(
+          path: '/cart',
+          builder: (context, state) => CartScreen(),
+        ),
         GoRoute(
           path: '/account',
           builder: (context, state) => const AccountScreen(),
         ),
       ],
     ),
+
+    // Full-screen routes (No Bottom Bar)
     GoRoute(
       path: '/category-products',
       builder: (context, state) {
@@ -56,6 +63,7 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/checkout',
       builder: (context, state) {
+        // Items passed from CartScreen or ProductDetailScreen
         final items = state.extra as List<CartItem>;
         return UniversalCheckout(checkoutItems: items);
       },

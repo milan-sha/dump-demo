@@ -1,15 +1,24 @@
-class CartItem {
-  String name;
-  double price;
-  int quantity;
+import 'package:equatable/equatable.dart';
 
-  CartItem({
+class CartItem extends Equatable {
+  final String name;
+  final double price;
+  final int quantity;
+
+  const CartItem({
     required this.name,
     required this.price,
     this.quantity = 1,
   });
+
+  CartItem copyWith({int? quantity}) {
+    return CartItem(
+      name: name,
+      price: price,
+      quantity: quantity ?? this.quantity,
+    );
+  }
+
+  @override
+  List<Object?> get props => [name, price, quantity];
 }
-
-// THE GLOBAL LIST
-List<CartItem> cartItems = [];
-

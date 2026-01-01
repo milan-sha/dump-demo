@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../models/hive_products.dart';
-import 'cart.dart'; // Access global cartItems
+import 'cart/cart.dart';
+import 'cart/cart_cubit/cart_cubit.dart'; // Access global cartItems
 
 class ProductDetailScreen extends StatelessWidget {
   final Product product;
@@ -130,16 +132,18 @@ class ProductDetailScreen extends StatelessWidget {
   }
 
   // Logic helper to keep build method clean
+// Inside ProductDetailScreen _addToCart method
   void _addToCart(BuildContext context) {
-    final existingItemIndex = cartItems.indexWhere((item) => item.name == product.title);
-    if (existingItemIndex != -1) {
-      cartItems[existingItemIndex].quantity += 1;
-    } else {
-      cartItems.add(CartItem(
-        name: product.title,
-        price: product.price,
-        quantity: 1,
-      ));
-    }
+    final cartItem = CartItem(
+      name: product.title,
+      price: product.price,
+      quantity: 1,
+    );
+
+    context.read<CartCubit>().addToCart(cartItem);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Added to Cart!")),
+    );
   }
 }

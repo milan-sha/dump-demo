@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_ce/hive_ce.dart';
-import '../models/hive_products.dart';
+import '../../models/hive_products.dart';
+
 
 class ProductListByCategoryPage extends StatelessWidget {
   final String categoryName;
