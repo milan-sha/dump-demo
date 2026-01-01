@@ -1,16 +1,12 @@
-import 'package:dump/routes.dart';
+import 'package:dump/service/storage%20_service.dart';
 import 'package:flutter/material.dart';
-import 'package:hive_ce_flutter/adapters.dart';
-
+import 'routes.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); //
+  WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Hive for Flutter
-  await Hive.initFlutter(); //
-
-  // Open the box to store user credentials
-  await Hive.openBox('userBox'); //
+  // Initialize your storage and products
+  await StorageServiceMixin.initHive();
 
   runApp(const MyApp());
 }
@@ -21,13 +17,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'Dump',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        scaffoldBackgroundColor: const Color(0xFFF5F5F5),
-      ),
-      routerConfig: appRouter,
+      routerConfig: appRouter, // Uses your GoRouter from routes.dart
+      theme: ThemeData(primarySwatch: Colors.blue),
     );
   }
 }

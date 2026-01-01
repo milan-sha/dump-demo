@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hive_ce/hive_ce.dart'; // ✅ ADDED
+import 'package:hive_ce/hive_ce.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -26,7 +26,6 @@ class _LoginPageState extends State<Login> {
     if (formKey.currentState!.validate()) {
       final box = Hive.box('userBox');
 
-      // ✅ SAVE USERNAME
       box.put('username', emailController.text.trim());
 
       context.go('/home');
@@ -82,8 +81,6 @@ class _LoginPageState extends State<Login> {
                   ),
 
                   const SizedBox(height: 20),
-
-                  // PASSWORD
                   TextFormField(
                     controller: passwordController,
                     obscureText: !isPasswordVisible,
@@ -145,8 +142,6 @@ class _LoginPageState extends State<Login> {
                   ),
 
                   const SizedBox(height: 20),
-
-                  // Register link
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

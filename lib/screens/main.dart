@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'home/home.dart';
-import 'cart_screen.dart';
+
 import ' category/category.dart';
 import 'account/account.dart';
 
@@ -17,7 +17,7 @@ class _MainScreenState extends State<MainScreen> {
   late final List<Widget> _screens = [
     const HomePage(),
     const CategoryScreen(),
-    CartScreen(),
+
     const AccountScreen(),
   ];
 

@@ -1,27 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../cart.dart'; // Ensure this points to your global cartItems list
-import '../products.dart';
+import '../../models/hive_products.dart';
+import '../cart.dart' show cartItems;
 import 'home_cubit/home_cubit.dart';
 import 'home_cubit/home_state.dart';
-
-
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
-
   @override
   Widget build(BuildContext context) {
-    // 1. Provide the Cubit and pass the initial products list
     return BlocProvider(
-      create: (context) => HomeCubit(allProducts),
+      create: (context) => HomeCubit()..loadProducts(),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Dump', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
+          title: const Text('DUMP', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
         ),
         body: Column(
           children: [
-            // SEARCH BAR
+
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Builder(
@@ -29,7 +25,7 @@ class HomePage extends StatelessWidget {
                   onChanged: (query) => context.read<HomeCubit>().filterProducts(query),
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.search),
-                    hintText: 'Search Products',
+                    hintText: 'Search sneakers...',
                     filled: true,
                     fillColor: Colors.grey[100],
                     border: OutlineInputBorder(
@@ -41,7 +37,6 @@ class HomePage extends StatelessWidget {
               ),
             ),
 
-            // PRODUCT GRID
             Expanded(
               child: BlocBuilder<HomeCubit, HomeState>(
                 builder: (context, state) {
@@ -50,23 +45,26 @@ class HomePage extends StatelessWidget {
                   }
 
                   if (state is HomeLoaded) {
+                    final products = state.filteredProducts;
+
+                    if (products.isEmpty) {
+                      return const Center(child: Text("No products found. Try a different search."));
+                    }
+
                     return GridView.builder(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         mainAxisSpacing: 16,
                         crossAxisSpacing: 16,
-                        mainAxisExtent: 310,
+                        mainAxisExtent: 280, // Adjusted for clean card look
                       ),
-                      itemCount: state.filteredProducts.length,
-                      itemBuilder: (context, index) {
-                        final product = state.filteredProducts[index];
-                        // Using the ProductCard defined below
-                        return ProductCard(product: product);
-                      },
+                      itemCount: products.length,
+                      itemBuilder: (context, index) => ProductCard(product: products[index]),
                     );
                   }
-                  return const Center(child: Text("No products found"));
+
+                  return const Center(child: Text("Something went wrong loading products."));
                 },
               ),
             ),
@@ -76,74 +74,69 @@ class HomePage extends StatelessWidget {
     );
   }
 }
-
-// THE MISSING WIDGET (ProductCard)
 class ProductCard extends StatelessWidget {
   final Product product;
   const ProductCard({super.key, required this.product});
 
   void _handleAddToCart(BuildContext context) {
-    // 1. Logic to update the global cart list immediately
-    final existingIndex = cartItems.indexWhere((item) => item.name == product.name);
+
+    final existingIndex = cartItems.indexWhere((item) => item.name == product.title);
 
     if (existingIndex >= 0) {
       cartItems[existingIndex].quantity++;
     } else {
-      cartItems.add(
-        CartItem(
-          name: product.name,
-          image: product.assetPath,
-          price: product.price,
-          quantity: 1,
-        ),
-      );
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
     }
-
-    // 2. Feedback to user (Stay on same page)
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${product.name} added to cart!'),
+        content: Text('${product.title} added to cart!'),
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 1),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.blueAccent,
       ),
     );
   }
-
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () => context.push('/product-detail', extra: product),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Image Placeholder/Loader
             Expanded(
-              child: Image.asset(product.assetPath, fit: BoxFit.cover),
+              child: Container(
+                width: double.infinity,
+                color: Colors.white,
+                child: Image.asset(
+                  product.assetPath,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) =>
+                  const Icon(Icons.broken_image, color: Colors.grey),
+                ),
+              ),
             ),
             Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(product.name, maxLines: 1, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  Text('₹${product.price.toStringAsFixed(0)}', style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                      onPressed: () => _handleAddToCart(context),
-                      child: const Text('Add to Cart', style: TextStyle(color: Colors.white, fontSize: 10)),
-                    ),
+                  Text(
+                    product.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                   ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '₹${product.price.toStringAsFixed(0)}',
+                    style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
                 ],
               ),
             ),

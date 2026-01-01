@@ -1,9 +1,9 @@
-// lib/models/hive_product.dart
-import 'package:hive_ce_flutter/hive_flutter.dart';
+import 'package:hive_ce/hive_ce.dart';
 
+part 'hive_products.g.dart';
 
 @HiveType(typeId: 1)
-class HiveProduct extends HiveObject {
+class Product extends HiveObject {
   @HiveField(0)
   final String category;
   @HiveField(1)
@@ -15,16 +15,19 @@ class HiveProduct extends HiveObject {
   @HiveField(4)
   final String brand;
 
-  HiveProduct({
+
+  Product({
     required this.category,
     required this.title,
     required this.description,
     required this.price,
     required this.brand,
   });
+  String get name => title;
+  String get assetPath => 'assets/default_product.jpg';
 
-  factory HiveProduct.fromJson(Map<String, dynamic> json) {
-    return HiveProduct(
+  factory Product.fromJson(Map<String, dynamic> json) {
+    return Product(
       category: json['category'] ?? '',
       title: json['title'] ?? '',
       description: json['description'] ?? '',

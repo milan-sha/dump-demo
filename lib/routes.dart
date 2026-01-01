@@ -1,25 +1,24 @@
-import 'package:dump/screens/products.dart';
+import 'package:dump/screens/%20category/category.dart';
+import 'package:dump/screens/cart.dart';
+import 'package:dump/screens/universalcheckout.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter/material.dart';
+import 'models/hive_products.dart';
 import 'screens/login/login.dart';
 import 'screens/home/home.dart';
-import 'screens/ category/category.dart';
-import 'screens/cart_screen.dart';
+
 import 'screens/account/account.dart';
 import 'screens/product_details.dart';
 import 'screens/product_list_by_category.dart';
-import 'screens/main.dart'; // Ensure this points to your MainScreen
-
+import 'screens/main.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/login',
   routes: [
-    // Login Route
     GoRoute(
       path: '/login',
       builder: (context, state) => const Login(),
     ),
-
-    // ShellRoute for the Bottom Navigation Tabs
     ShellRoute(
       builder: (context, state, child) {
         return MainScreen(child: child);
@@ -33,18 +32,13 @@ final GoRouter appRouter = GoRouter(
           path: '/category',
           builder: (context, state) => const CategoryScreen(),
         ),
-        GoRoute(
-          path: '/cart',
-          builder: (context, state) => const CartScreen(),
-        ),
+
         GoRoute(
           path: '/account',
           builder: (context, state) => const AccountScreen(),
         ),
       ],
     ),
-
-    // Category Products page
     GoRoute(
       path: '/category-products',
       builder: (context, state) {
@@ -52,8 +46,6 @@ final GoRouter appRouter = GoRouter(
         return ProductListByCategoryPage(categoryName: categoryName);
       },
     ),
-
-    // Product Detail page
     GoRoute(
       path: '/product-detail',
       builder: (context, state) {
@@ -61,6 +53,12 @@ final GoRouter appRouter = GoRouter(
         return ProductDetailScreen(product: product);
       },
     ),
-
+    GoRoute(
+      path: '/checkout',
+      builder: (context, state) {
+        final items = state.extra as List<CartItem>;
+        return UniversalCheckout(checkoutItems: items);
+      },
+    ),
   ],
 );

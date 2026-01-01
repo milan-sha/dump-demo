@@ -1,148 +1,145 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-
-import 'cart.dart';
-import 'products.dart';
+import '../models/hive_products.dart';
+import 'cart.dart'; // Access global cartItems
 
 class ProductDetailScreen extends StatelessWidget {
   final Product product;
-
   const ProductDetailScreen({super.key, required this.product});
-
-  // Add to cart function
-  void _addToCart(BuildContext context) {
-    final existingIndex =
-    cartItems.indexWhere((item) => item.name == product.name);
-
-    if (existingIndex >= 0) {
-      cartItems[existingIndex].quantity++;
-    } else {
-      cartItems.add(
-        CartItem(
-          name: product.name,
-          image: product.assetPath,
-          price: product.price,
-          quantity: 1,
-        ),
-      );
-    }
-
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${product.name} added to cart!'),
-        backgroundColor: Colors.blue,
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(product.name)),
+      appBar: AppBar(
+        title: Text(product.title),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      extendBodyBehindAppBar: true,
       body: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // 1. STYLIZED HERO BANNER (No image dependency)
             Hero(
-              tag: product.name,
-              child: Image.asset(
-                product.assetPath,
+              tag: product.title,
+              child: Container(
                 width: double.infinity,
                 height: 350,
-                fit: BoxFit.cover,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.blue.shade300, Colors.blue.shade700],
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(40),
+                    bottomRight: Radius.circular(40),
+                  ),
+                ),
+                child: const Icon(Icons.shopping_bag_outlined, size: 120, color: Colors.white),
               ),
             ),
+
+            // 2. PRODUCT INFO
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(24.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(product.name,
-                      style: const TextStyle(
-                          fontSize: 28, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  Text('₹${product.price.toStringAsFixed(0)}',
-                      style: const TextStyle(
-                          fontSize: 24,
-                          color: Colors.green,
-                          fontWeight: FontWeight.w600)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        product.category.toUpperCase(),
+                        style: TextStyle(color: Colors.blue.shade700, fontWeight: FontWeight.bold, letterSpacing: 1.2),
+                      ),
+                      Text(
+                        "₹${product.price.toStringAsFixed(0)}",
+                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.green),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(product.title, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 20),
-                  const Text("About this product",
-                      style:
-                      TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const Text("Description", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
-                  Text(product.description.isNotEmpty
-                      ? product.description
-                      : "Premium quality product from Dump. Durable and modern design. Perfect for your daily needs with high-performance materials.",
-                      style: const TextStyle(
-                          fontSize: 16, color: Colors.grey, height: 1.5)),
-                  const SizedBox(height: 100),
+                  Text(
+                    "High-quality ${product.title} in the ${product.category} category. Designed for comfort and durability.",
+                    style: TextStyle(fontSize: 16, color: Colors.grey.shade700, height: 1.5),
+                  ),
                 ],
               ),
             ),
           ],
         ),
       ),
+
+      // 3. STRUCTURED ACTION BUTTONS
       bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
         decoration: BoxDecoration(
           color: Colors.white,
-          boxShadow: const [
-            BoxShadow(
-                color: Colors.black12, blurRadius: 10, offset: Offset(0, -2))
-          ],
+          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
         ),
-        child: SafeArea(
-          child: Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => _addToCart(context),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.blue, width: 2),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: const Text("ADD TO CART",
-                      style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue)),
+        child: Row(
+          children: [
+            // BUTTON 1: ADD TO CART
+            Expanded(
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: Colors.blue.shade700, width: 2),
+                  minimumSize: const Size(0, 55),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                 ),
+                onPressed: () {
+                  _addToCart(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("${product.title} added to cart!")),
+                  );
+                },
+                child: Text("ADD TO CART", style: TextStyle(color: Colors.blue.shade700, fontWeight: FontWeight.bold)),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Go to checkout page with only this product
-                    context.push('/checkout', extra: [
-                      CartItem(
-                        name: product.name,
-                        image: product.assetPath,
-                        price: product.price,
-                        quantity: 1,
-                      )
-                    ]);
-                  },
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12))),
-                  child: const Text(
-                    "BUY NOW",
-                    style: TextStyle(fontSize: 14, color: Colors.white),
-                  ),
+            ),
+            const SizedBox(width: 15),
+            // BUTTON 2: BUY NOW (Direct to Checkout)
+            Expanded(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue.shade700,
+                  minimumSize: const Size(0, 55),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                 ),
+                onPressed: () {
+                  // Create a temporary list for immediate checkout
+                  final directItem = CartItem(
+                    name: product.title,
+                    price: product.price,
+                    quantity: 1,
+                  );
+                  context.push('/checkout', extra: [directItem]);
+                },
+                child: const Text("BUY NOW", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  // Logic helper to keep build method clean
+  void _addToCart(BuildContext context) {
+    final existingItemIndex = cartItems.indexWhere((item) => item.name == product.title);
+    if (existingItemIndex != -1) {
+      cartItems[existingItemIndex].quantity += 1;
+    } else {
+      cartItems.add(CartItem(
+        name: product.title,
+        price: product.price,
+        quantity: 1,
+      ));
+    }
   }
 }

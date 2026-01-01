@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-import '../models/cartI_item.dart';
+import 'cart.dart' show cartItems, CartItem;
 
 class UniversalCheckout extends StatefulWidget {
   final List<CartItem> checkoutItems;
@@ -16,17 +16,27 @@ class UniversalCheckout extends StatefulWidget {
 class _UniversalCheckoutState extends State<UniversalCheckout> {
   final _formKey = GlobalKey<FormState>();
 
+  // Form Controllers
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
 
-  // --- DELIVERY SCHEDULE STATE ---
+  // Delivery Window State
   DateTime? _selectedStartDateTime;
-  DateTime? _selectedEndDateTime; // User-selected end window
+  DateTime? _selectedEndDateTime;
 
+  // --- PRICING LOGIC ---
+
+  // Calculate Subtotal
   double get subtotal =>
       widget.checkoutItems.fold(0, (sum, item) => sum + (item.price * item.quantity));
+
+  // NEW: Dynamic Shipping based on your rule
+  double get shipping => subtotal < 70 ? 20.0 : 50.0;
+
+  // Grand Total
+  double get total => subtotal + shipping;
 
   @override
   void dispose() {
@@ -37,14 +47,14 @@ class _UniversalCheckoutState extends State<UniversalCheckout> {
     super.dispose();
   }
 
-  // --- START TIME PICKER ---
+  // --- TIME PICKER LOGIC ---
   Future<void> _selectStartSchedule(BuildContext context) async {
     final DateTime now = DateTime.now();
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: now,
       firstDate: now,
-      lastDate: DateTime(now.year + 2),
+      lastDate: DateTime(now.year + 2 ),
     );
 
     if (pickedDate == null) return;
@@ -68,18 +78,16 @@ class _UniversalCheckoutState extends State<UniversalCheckout> {
 
     setState(() {
       _selectedStartDateTime = combined;
-      _selectedEndDateTime = null; // Reset end time if start changes
+      _selectedEndDateTime = null;
     });
   }
 
-  // --- END TIME PICKER (The 24h Logic) ---
   Future<void> _selectEndSchedule(BuildContext context) async {
     if (_selectedStartDateTime == null) {
       _showSnackBar("Please select a Start Time first.");
       return;
     }
 
-    // Lock the date to only the Start Date or the next day
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: _selectedStartDateTime!,
@@ -101,13 +109,12 @@ class _UniversalCheckoutState extends State<UniversalCheckout> {
       pickedTime.hour, pickedTime.minute,
     );
 
-    // Validation
     final duration = combinedEnd.difference(_selectedStartDateTime!);
 
     if (combinedEnd.isBefore(_selectedStartDateTime!)) {
       _showSnackBar("End time cannot be before Start time.");
     } else if (duration.inHours >= 24) {
-      _showSnackBar("Window cannot exceed 24 hours.");
+      _showSnackBar("Delivery window cannot exceed 24 hours.");
     } else {
       setState(() {
         _selectedEndDateTime = combinedEnd;
@@ -119,17 +126,16 @@ class _UniversalCheckoutState extends State<UniversalCheckout> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
-  bool isValidEmail(String email) {
-    return RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(email);
-  }
-
   @override
   Widget build(BuildContext context) {
-    const double shipping = 50.0;
+    // 1. Calculate Shipping based on your condition
+    final double shipping = subtotal < 70 ? 20.0 : 0.0;
+
+    // 2. Calculate Total
     final double total = subtotal + shipping;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Confirm Order")),
+      appBar: AppBar(title: const Text("Checkout")),
       body: Column(
         children: [
           Expanded(
@@ -142,55 +148,102 @@ class _UniversalCheckoutState extends State<UniversalCheckout> {
                   children: [
                     _sectionTitle("Personal Details"),
                     _buildTextField(_nameController, "Full Name", Icons.person),
-                    _buildTextField(_emailController, "Email", Icons.email,
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (value) => (value == null || !isValidEmail(value)) ? "Enter valid email" : null),
+                    _buildTextField(_emailController, "Email", Icons.email, keyboardType: TextInputType.emailAddress),
                     _buildTextField(_phoneController, "Phone", Icons.phone, keyboardType: TextInputType.phone),
                     _buildTextField(_addressController, "Shipping Address", Icons.location_on, maxLines: 2),
 
                     const SizedBox(height: 20),
-                    _sectionTitle("Delivery Window (Max 24 Hours)"),
-
-                    // START TIME BOX
+                    _sectionTitle("Delivery Window (Max 24h)"),
                     _scheduleTile(
                       title: _selectedStartDateTime == null ? "Select Start Time" : DateFormat('MMM d, hh:mm a').format(_selectedStartDateTime!),
-                      subtitle: "Beginning of delivery window",
-                      icon: Icons.start_rounded,
+                      subtitle: "Earliest arrival",
+                      icon: Icons.access_time,
                       onTap: () => _selectStartSchedule(context),
                       isSelected: _selectedStartDateTime != null,
                     ),
-
                     const SizedBox(height: 10),
-
-                    // END TIME BOX
                     _scheduleTile(
                       title: _selectedEndDateTime == null ? "Select End Time" : DateFormat('MMM d, hh:mm a').format(_selectedEndDateTime!),
-                      subtitle: "End of delivery window",
-                      icon: Icons.update_rounded,
+                      subtitle: "Latest arrival",
+                      icon: Icons.timer_outlined,
                       onTap: () => _selectEndSchedule(context),
                       isSelected: _selectedEndDateTime != null,
                       enabled: _selectedStartDateTime != null,
                     ),
 
-                    const SizedBox(height: 20),
-                    _sectionTitle("Order Items"),
+                    const SizedBox(height: 25),
+                    _sectionTitle("Order Summary"),
                     ...widget.checkoutItems.map((item) => ListTile(
                       contentPadding: EdgeInsets.zero,
-                      leading: Image.asset(item.image, width: 40),
-                      title: Text(item.name),
+                      title: Text(item.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text("Qty: ${item.quantity} x ₹${item.price.toStringAsFixed(0)}"),
                       trailing: Text("₹${(item.price * item.quantity).toStringAsFixed(0)}"),
                     )),
                     const Divider(height: 30),
                     _priceRow("Subtotal", subtotal),
-                    _priceRow("Shipping", shipping),
+
+                    // Display "Free" text if shipping is 0
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text("Shipping", style: TextStyle(fontSize: 16)),
+                          Text(
+                            shipping == 0 ? "FREE" : "₹${shipping.toStringAsFixed(0)}",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: shipping == 0 ? Colors.green : Colors.black,
+                              fontWeight: shipping == 0 ? FontWeight.bold : FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
                     _priceRow("Grand Total", total, isBold: true),
+
+                    // Optional: Show a hint about free delivery
+                    if (shipping > 0)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          "Add ₹${(70 - subtotal).toStringAsFixed(0)} more for FREE delivery!",
+                          style: const TextStyle(color: Colors.orange, fontSize: 12, fontWeight: FontWeight.bold),
+                        ),
+                      ),
                   ],
                 ),
               ),
             ),
           ),
-          _buildConfirmButton(context, total),
+          _buildPayButton(context, total),
         ],
+      ),
+    );
+  }
+
+  // --- UI WIDGET HELPERS ---
+
+  Widget _sectionTitle(String title) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8),
+    child: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+  );
+
+  Widget _buildTextField(TextEditingController controller, String label, IconData icon, {int maxLines = 1, TextInputType keyboardType = TextInputType.text}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: TextFormField(
+        controller: controller,
+        maxLines: maxLines,
+        keyboardType: keyboardType,
+        decoration: InputDecoration(
+          labelText: label,
+          prefixIcon: Icon(icon, size: 20),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        ),
+        validator: (value) => (value == null || value.isEmpty) ? "Field required" : null,
       ),
     );
   }
@@ -199,22 +252,21 @@ class _UniversalCheckoutState extends State<UniversalCheckout> {
     return InkWell(
       onTap: enabled ? onTap : null,
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: enabled ? Colors.white : Colors.grey.shade100,
-          border: Border.all(color: isSelected ? Colors.orange : Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: isSelected ? Colors.blue : Colors.grey.shade300, width: 2),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           children: [
-            Icon(icon, color: enabled ? Colors.orange : Colors.grey),
-            const SizedBox(width: 15),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+            Icon(icon, color: isSelected ? Colors.blue : Colors.grey),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(title, style: TextStyle(fontWeight: FontWeight.bold, color: enabled ? Colors.black : Colors.grey)),
                 Text(subtitle, style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
-              ],
+              ]),
             ),
           ],
         ),
@@ -222,68 +274,58 @@ class _UniversalCheckoutState extends State<UniversalCheckout> {
     );
   }
 
-  Widget _sectionTitle(String title) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 10),
-    child: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-  );
-
-  Widget _buildTextField(TextEditingController controller, String label, IconData icon, {int maxLines = 1, TextInputType keyboardType = TextInputType.text, String? Function(String?)? validator}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
-      child: TextFormField(
-        controller: controller,
-        maxLines: maxLines,
-        keyboardType: keyboardType,
-        decoration: InputDecoration(labelText: label, prefixIcon: Icon(icon), border: const OutlineInputBorder()),
-        validator: validator ?? (v) => (v == null || v.isEmpty) ? "Required" : null,
-      ),
-    );
-  }
-
   Widget _priceRow(String label, double amount, {bool isBold = false}) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 2),
+    padding: const EdgeInsets.symmetric(vertical: 4),
     child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Text(label, style: TextStyle(fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
-      Text("₹${amount.toStringAsFixed(0)}"),
+      Text(label, style: TextStyle(fontSize: 16, fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
+      Text("₹${amount.toStringAsFixed(0)}", style: TextStyle(fontSize: 16, fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
     ]),
   );
 
-  Widget _buildConfirmButton(BuildContext context, double total) => Container(
+  Widget _buildPayButton(BuildContext context, double total) => Container(
     padding: const EdgeInsets.all(20),
+    decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -5))]),
     child: ElevatedButton(
-      style: ElevatedButton.styleFrom(backgroundColor: Colors.orange, minimumSize: const Size(double.infinity, 50)),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        minimumSize: const Size(double.infinity, 55),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
       onPressed: () {
         if (_formKey.currentState!.validate()) {
           if (_selectedStartDateTime == null || _selectedEndDateTime == null) {
-            _showSnackBar("Please select both Start and End times.");
+            _showSnackBar("Please select your delivery window.");
             return;
           }
-          _showVerificationSheet(context);
+          _confirmPayment(context, total);
         }
       },
-      child: Text("Pay ₹${total.toStringAsFixed(0)}", style: const TextStyle(color: Colors.white)),
+      child: Text("Pay ₹${total.toStringAsFixed(0)}", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
     ),
   );
 
-  void _showVerificationSheet(BuildContext context) {
+  void _confirmPayment(BuildContext context, double total) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (context) => Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text("Verify Delivery Window", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const Divider(),
-            _infoRow("Deliver to", _addressController.text),
-            _infoRow("Starts", DateFormat('MMM d, h:mm a').format(_selectedStartDateTime!)),
-            _infoRow("Ends", DateFormat('MMM d, h:mm a').format(_selectedEndDateTime!)),
-            _infoRow("Total", "₹${(subtotal + 50).toStringAsFixed(0)}"),
-            const SizedBox(height: 20),
+            const Icon(Icons.check_circle_outline, color: Colors.green, size: 60),
+            const SizedBox(height: 16),
+            const Text("Ready to Place Order?", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Text("Total amount: ₹${total.toStringAsFixed(0)}"),
+            const SizedBox(height: 24),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: Colors.green, minimumSize: const Size(double.infinity, 50)),
-              onPressed: () => _showSuccessDialog(context),
+              onPressed: () {
+                Navigator.pop(context); // Close sheet
+                _completeOrder(context);
+              },
               child: const Text("Confirm & Pay", style: TextStyle(color: Colors.white)),
             ),
           ],
@@ -292,21 +334,20 @@ class _UniversalCheckoutState extends State<UniversalCheckout> {
     );
   }
 
-  Widget _infoRow(String label, String value) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4),
-    child: Row(children: [
-      Text("$label: ", style: const TextStyle(fontWeight: FontWeight.bold)),
-      Expanded(child: Text(value, overflow: TextOverflow.ellipsis)),
-    ]),
-  );
+  void _completeOrder(BuildContext context) {
+    setState(() {
+      cartItems.clear();
+    });
 
-  void _showSuccessDialog(BuildContext context) {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text("Order Placed!"),
-        content: Text("Delivering is  ${DateFormat('h:mm a').format(_selectedEndDateTime!)} on ${DateFormat('MMM d').format(_selectedStartDateTime!)}"),
-        actions: [TextButton(onPressed: () => context.go('/home'), child: const Text("OK"))],
+        title: const Text("Order Success!"),
+        content: const Text("Your items are on the way. Check your email for details."),
+        actions: [
+          TextButton(onPressed: () => context.go('/home'), child: const Text("Back to Home")),
+        ],
       ),
     );
   }
