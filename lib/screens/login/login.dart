@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+
 import 'login_cubit/login_cubit.dart';
-import 'login_cubit/login_state.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -28,12 +28,16 @@ class _LoginState extends State<Login> {
     return BlocProvider(
       create: (context) => LoginCubit(),
       child: BlocListener<LoginCubit, LoginState>(
+        // Listen for navigation and errors (side effects)
         listener: (context, state) {
-          if (state is LoginSuccess) {
+          if (state.loginStatus == LoginStatus.success) {
             context.go('/home');
-          } else if (state is LoginFailure) {
+          } else if (state.loginStatus == LoginStatus.error) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
+              SnackBar(
+                content: Text(state.errorMessage ?? "Authentication failed"),
+                backgroundColor: Colors.red,
+              ),
             );
           }
         },
@@ -47,7 +51,7 @@ class _LoginState extends State<Login> {
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   child: BlocBuilder<LoginCubit, LoginState>(
                     builder: (context, state) {
-                      final cubit = context.read<LoginCubit>();
+                      // Note: state now contains isPasswordVisible and loginStatus
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -87,20 +91,23 @@ class _LoginState extends State<Login> {
                           ),
 
                           const SizedBox(height: 20),
+
+                          // PASSWORD
                           TextFormField(
                             controller: _passwordController,
-                            obscureText: !cubit.isPasswordVisible,
+                            // Use state property instead of cubit getter
+                            obscureText: !state.isPasswordVisible,
                             decoration: InputDecoration(
                               labelText: "PASSWORD",
                               border: const UnderlineInputBorder(),
                               suffixIcon: IconButton(
                                 icon: Icon(
-                                  cubit.isPasswordVisible
+                                  state.isPasswordVisible
                                       ? Icons.visibility
                                       : Icons.visibility_off,
                                   color: Colors.grey,
                                 ),
-                                onPressed: () => cubit.togglePasswordVisibility(),
+                                onPressed: () => context.read<LoginCubit>().togglePasswordVisibility(),
                               ),
                             ),
                             validator: (value) {
@@ -111,35 +118,35 @@ class _LoginState extends State<Login> {
                             },
                           ),
 
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 30),
 
-                          if (state is LoginLoading)
-                            const Center(child: CircularProgressIndicator())
-                          else
-                            ElevatedButton(
-                              onPressed: () {
-                                if (_formKey.currentState!.validate()) {
-                                  cubit.login(
-                                    _emailController.text.trim(),
-                                    _passwordController.text.trim(),
-                                  );
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue,
-                                padding: const EdgeInsets.symmetric(vertical: 14),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              child: const Text(
-                                "Login",
-                                style: TextStyle(color: Colors.white, fontSize: 16),
+                          // LOGIN BUTTON / LOADING
+                          state.loginStatus == LoginStatus.loading
+                              ? const Center(child: CircularProgressIndicator())
+                              : ElevatedButton(
+                            onPressed: () {
+                              if (_formKey.currentState!.validate()) {
+                                context.read<LoginCubit>().login(
+                                  _emailController.text.trim(),
+                                  _passwordController.text.trim(),
+                                );
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
                               ),
                             ),
+                            child: const Text(
+                              "Login",
+                              style: TextStyle(color: Colors.white, fontSize: 16),
+                            ),
+                          ),
 
                           const SizedBox(height: 20),
-
+                          // ... Social buttons and footer remain the same
                           // Social Sign-In Buttons
                           OutlinedButton.icon(
                             onPressed: () {},

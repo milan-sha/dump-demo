@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+
 import 'cart.dart';
 import 'cart_cubit/cart_cubit.dart';
-import 'cart_cubit/cart_state.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -21,7 +21,8 @@ class CartScreen extends StatelessWidget {
       ),
       body: BlocBuilder<CartCubit, CartState>(
         builder: (context, state) {
-          if (state is CartLoaded && state.items.isNotEmpty) {
+          // Check if items list has data instead of 'is CartLoaded'
+          if (state.items.isNotEmpty) {
             return Column(
               children: [
                 Expanded(
@@ -38,7 +39,8 @@ class CartScreen extends StatelessWidget {
               ],
             );
           }
-          // If cart is empty or in initial state
+
+          // Fallback to empty state
           return _buildEmptyState(context);
         },
       ),
@@ -63,8 +65,7 @@ class CartScreen extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            height: 80,
-            width: 80,
+            height: 80, width: 80,
             decoration: BoxDecoration(
                 color: Colors.blue[50], borderRadius: BorderRadius.circular(15)),
             child: const Icon(Icons.shopping_bag_outlined, color: Colors.blue),
@@ -83,17 +84,14 @@ class CartScreen extends StatelessWidget {
               ],
             ),
           ),
-          // QUANTITY CONTROLS
           Row(
             children: [
-              // Decrement button
               _qtyBtn(Icons.remove, () => context.read<CartCubit>().removeOneFromCart(item)),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Text("${item.quantity}",
                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               ),
-              // Increment button (reusing addToCart logic)
               _qtyBtn(Icons.add, () => context.read<CartCubit>().addToCart(item)),
             ],
           )
@@ -115,7 +113,8 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildOrderSummary(BuildContext context, CartLoaded state) {
+  // Changed parameter type from CartLoaded to CartState
+  Widget _buildOrderSummary(BuildContext context, CartState state) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: const BoxDecoration(
@@ -131,7 +130,7 @@ class CartScreen extends StatelessWidget {
             children: [
               Text("Total Amount",
                   style: TextStyle(color: Colors.grey[600], fontSize: 16)),
-              Text("₹${state.subtotal}",
+              Text("₹${state.subtotal.toStringAsFixed(2)}",
                   style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
             ],
           ),
@@ -147,12 +146,8 @@ class CartScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(18)),
               ),
               onPressed: () {
-                // 1. Navigate to your checkout screen
                 context.push('/checkout', extra: state.items);
-
-                // 2. CLEAR THE CART
-                // We clear it here so that when the user comes back from checkout, the bag is fresh.
-                context.read<CartCubit>().clearCart();
+                // context.read<CartCubit>().clearCart(); // Clear after success
               },
               child: const Text("Checkout Now",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
@@ -174,6 +169,10 @@ class CartScreen extends StatelessWidget {
               style: TextStyle(
                   fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey)),
           const SizedBox(height: 10),
+          TextButton(
+              onPressed: () => context.go('/home'),
+              child: const Text("Go Shopping")
+          )
         ],
       ),
     );

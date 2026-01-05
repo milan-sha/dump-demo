@@ -1,15 +1,32 @@
-// account_state.dart
-abstract class AccountState {}
+part of 'account_cubit.dart';
 
-class AccountInitial extends AccountState {}
 
-class AccountLoading extends AccountState {}
 
-class AccountLoaded extends AccountState {
+class AccountState extends Equatable {
+  final AccountStatus accountStatus;
   final String username;
   final String password;
 
-  AccountLoaded({required this.username, required this.password});
+  const AccountState({
+    this.accountStatus = AccountStatus.initial,
+    this.username = '',
+    this.password = '',
+  });
+
+  AccountState copyWith({
+    AccountStatus? accountStatus,
+    String? username,
+    String? password,
+  }) {
+    return AccountState(
+      accountStatus: accountStatus ?? this.accountStatus,
+      username: username ?? this.username,
+      password: password ?? this.password,
+    );
+  }
+
+  @override
+  List<Object?> get props => [accountStatus, username, password];
 }
 
-class AccountLogout extends AccountState {}
+enum AccountStatus { initial, loading, loaded, logout, error }

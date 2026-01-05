@@ -1,16 +1,35 @@
-import '../../../models/hive_products.dart';
+part of 'home_cubit.dart';
 
-abstract class HomeState {}
-
-class HomeLoading extends HomeState {}
-
-class HomeLoaded extends HomeState {
+class HomeState extends Equatable {
+  final HomeStatus homeStatus;
   final List<Product> allProducts;
   final List<Product> filteredProducts;
-  HomeLoaded({required this.allProducts, required this.filteredProducts});
+  final String? errorMessage;
+
+  const HomeState({
+    this.homeStatus = HomeStatus.initial,
+    this.allProducts = const [],
+    this.filteredProducts = const [],
+    this.errorMessage,
+  });
+
+  HomeState copyWith({
+    HomeStatus? homeStatus,
+    List<Product>? allProducts,
+    List<Product>? filteredProducts,
+    String? errorMessage,
+    bool clearErrorMessage = false,
+  }) {
+    return HomeState(
+      homeStatus: homeStatus ?? this.homeStatus,
+      allProducts: allProducts ?? this.allProducts,
+      filteredProducts: filteredProducts ?? this.filteredProducts,
+      errorMessage: clearErrorMessage ? null : (errorMessage ?? this.errorMessage),
+    );
+  }
+
+  @override
+  List<Object?> get props => [homeStatus, allProducts, filteredProducts, errorMessage];
 }
 
-class HomeError extends HomeState {
-  final String message;
-  HomeError(this.message);
-}
+enum HomeStatus { initial, loading, loaded, error }

@@ -3,65 +3,101 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/hive_products.dart';
 import 'home_cubit/home_cubit.dart';
-import 'home_cubit/home_state.dart';
+
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
+      // Automatically triggers product loading on startup
       create: (context) => HomeCubit()..loadProducts(),
       child: Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
           title: const Text('DUMP',
               style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
+          elevation: 0,
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
         ),
         body: Column(
           children: [
+            // --- Search Bar Section ---
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Builder(
-                builder: (context) => TextField(
-                  onChanged: (query) => context.read<HomeCubit>().filterProducts(query),
-                  decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.search),
-                    hintText: 'Search sneakers...',
-                    filled: true,
-                    fillColor: Colors.grey[100],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(24),
-                      borderSide: BorderSide.none,
-                    ),
+              child: TextField(
+                onChanged: (query) => context.read<HomeCubit>().filterProducts(query),
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.search),
+                  hintText: 'Search sneakers...',
+                  filled: true,
+                  fillColor: Colors.grey[100],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide.none,
                   ),
                 ),
               ),
             ),
+
+            // --- Products Grid Section ---
             Expanded(
               child: BlocBuilder<HomeCubit, HomeState>(
                 builder: (context, state) {
-                  if (state is HomeLoading) {
+                  // 1. Loading State
+                  if (state.homeStatus == HomeStatus.loading ||
+                      state.homeStatus == HomeStatus.initial) {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  if (state is HomeLoaded) {
-                    final products = state.filteredProducts;
-
-                    if (products.isEmpty) {
-                      return const Center(child: Text("No products found."));
-                    }
-
-                    return GridView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 16,
-                        crossAxisSpacing: 16,
-                        mainAxisExtent: 280,
+                  // 2. Error State
+                  if (state.homeStatus == HomeStatus.error) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                          const SizedBox(height: 16),
+                          Text(state.errorMessage ?? "Something went wrong."),
+                          TextButton(
+                            onPressed: () => context.read<HomeCubit>().loadProducts(),
+                            child: const Text("Retry"),
+                          )
+                        ],
                       ),
-                      itemCount: products.length,
-                      itemBuilder: (context, index) => ProductCard(product: products[index]),
                     );
                   }
-                  return const Center(child: Text("Something went wrong."));
+
+                  // 3. Loaded State
+                  final products = state.filteredProducts;
+
+                  if (products.isEmpty) {
+                    return const Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.search_off, size: 64, color: Colors.grey),
+                          const SizedBox(height: 16),
+                          Text("No sneakers found.",
+                              style: TextStyle(color: Colors.grey)),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return GridView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 16,
+                      crossAxisSpacing: 16,
+                      mainAxisExtent: 280,
+                    ),
+                    itemCount: products.length,
+                    itemBuilder: (context, index) =>
+                        ProductCard(product: products[index]),
+                  );
                 },
               ),
             ),
@@ -71,14 +107,21 @@ class HomePage extends StatelessWidget {
     );
   }
 }
+
+// --- Product Card Widget Definition ---
+// Defining this here fixes the "Method not defined" error
 class ProductCard extends StatelessWidget {
   final Product product;
   const ProductCard({super.key, required this.product});
+
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+        side: BorderSide(color: Colors.grey[200]!),
+      ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () => context.push('/product-detail', extra: product),
@@ -86,20 +129,16 @@ class ProductCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: Stack(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    color: Colors.white,
-                    child: Image.asset(
-                      product.assetPath,
-                      height: 150,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) =>
-                      const Icon(Icons.broken_image, color: Colors.grey),
-                    ),
-                  ),
-                ],
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                color: Colors.grey[50],
+                child: Image.asset(
+                  product.assetPath,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) =>
+                  const Icon(Icons.broken_image, color: Colors.grey),
+                ),
               ),
             ),
             Padding(
@@ -116,7 +155,11 @@ class ProductCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     '₹${product.price.toStringAsFixed(0)}',
-                    style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 16,
+                    ),
                   ),
                 ],
               ),

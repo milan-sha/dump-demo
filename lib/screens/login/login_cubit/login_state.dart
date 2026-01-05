@@ -1,15 +1,31 @@
-abstract class LoginState {}
+part of 'login_cubit.dart';
 
-class LoginInitial extends LoginState {
+class LoginState extends Equatable {
+  final LoginStatus loginStatus;
   final bool isPasswordVisible;
-  LoginInitial({this.isPasswordVisible = false});
+  final String? errorMessage;
+
+  const LoginState({
+    this.loginStatus = LoginStatus.initial,
+    this.isPasswordVisible = false,
+    this.errorMessage,
+  });
+
+  LoginState copyWith({
+    LoginStatus? loginStatus,
+    bool? isPasswordVisible,
+    String? errorMessage,
+    bool clearErrorMessage = false,
+  }) {
+    return LoginState(
+      loginStatus: loginStatus ?? this.loginStatus,
+      isPasswordVisible: isPasswordVisible ?? this.isPasswordVisible,
+      errorMessage: clearErrorMessage ? null : (errorMessage ?? this.errorMessage),
+    );
+  }
+
+  @override
+  List<Object?> get props => [loginStatus, isPasswordVisible, errorMessage];
 }
 
-class LoginLoading extends LoginState {}
-
-class LoginSuccess extends LoginState {}
-
-class LoginFailure extends LoginState {
-  final String message;
-  LoginFailure(this.message);
-}
+enum LoginStatus { initial, loading, success, error }

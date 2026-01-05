@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'account/account.dart';
 import 'cart/cart_cubit/cart_cubit.dart';
 import 'cart/cart_screen.dart';
-import 'cart/cart_cubit/cart_state.dart'; // Ensure this contains CartLoaded and items
 import 'category/category.dart';
 import 'home/home.dart';
-import 'account/account.dart';
 
 class MainScreen extends StatefulWidget {
   final Widget child;
@@ -18,10 +18,11 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
+  // Screens preserved in an IndexedStack to maintain scroll positions
   late final List<Widget> _screens = [
     const HomePage(),
     const CategoryScreen(),
-    CartScreen(),
+    const CartScreen(), // Ensure CartScreen is const if possible
     const AccountScreen(),
   ];
 
@@ -32,6 +33,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // IndexedStack prevents the screens from rebuilding when switching tabs
       body: IndexedStack(index: _selectedIndex, children: _screens),
       bottomNavigationBar: SafeArea(
         child: Padding(
@@ -72,14 +74,14 @@ class _MainScreenState extends State<MainScreen> {
                     activeIcon: Icon(Icons.grid_view),
                     label: 'Category',
                   ),
+// Inside your MainScreen building the Badge:
                   BottomNavigationBarItem(
                     icon: BlocBuilder<CartCubit, CartState>(
+                      // Changed .cartItems to .items to match your likely Cubit state
+                      buildWhen: (previous, current) => previous.items != current.items,
                       builder: (context, state) {
-                        int count = 0;
-                        // Pattern matching or 'is' check allows access to .items
-                        if (state is CartLoaded) {
-                          count = state.items.fold(0, (sum, item) => sum + item.quantity);
-                        }
+                        // Calculate total quantity from state.items
+                        int count = state.items.fold(0, (sum, item) => sum + item.quantity);
 
                         return Badge(
                           label: Text('$count'),

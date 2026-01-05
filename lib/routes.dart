@@ -1,7 +1,7 @@
 import 'package:dump/screens/cart/cart.dart';
 import 'package:dump/screens/cart/cart_screen.dart';
 import 'package:dump/screens/category/category.dart';
-import 'package:dump/screens/category/product_categoryz_by_list/product_list_by_category.dart';
+import 'package:dump/screens/category/product_list_by_category.dart';
 import 'package:go_router/go_router.dart';
 import 'models/hive_products.dart';
 import 'screens/login/login.dart';

@@ -1,29 +1,39 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../service/storage _service.dart';// Ensure no spaces in filename
-import 'home_state.dart';
+import '../../../models/hive_products.dart';
+import '../../../service/storage _service.dart';
+
+part 'home_state.dart';
 
 class HomeCubit extends Cubit<HomeState> with StorageServiceMixin {
-  HomeCubit() : super(HomeLoading());
+  HomeCubit() : super(const HomeState());
 
   void loadProducts() {
+    emit(state.copyWith(homeStatus: HomeStatus.loading, clearErrorMessage: true));
     try {
       final products = getHiveProducts();
-      emit(HomeLoaded(allProducts: products, filteredProducts: products));
+      emit(state.copyWith(
+        homeStatus: HomeStatus.loaded,
+        allProducts: products,
+        filteredProducts: products,
+      ));
     } catch (e) {
-      emit(HomeError("Failed to load products: ${e.toString()}"));
+      emit(state.copyWith(
+        homeStatus: HomeStatus.error,
+        errorMessage: "Failed to load products: ${e.toString()}",
+      ));
     }
   }
 
   void filterProducts(String query) {
-    if (state is HomeLoaded) {
-      final current = state as HomeLoaded;
+    if (state.homeStatus == HomeStatus.loaded) {
       if (query.isEmpty) {
-        emit(HomeLoaded(allProducts: current.allProducts, filteredProducts: current.allProducts));
+        emit(state.copyWith(filteredProducts: state.allProducts));
       } else {
-        final filtered = current.allProducts
+        final filtered = state.allProducts
             .where((p) => p.title.toLowerCase().contains(query.toLowerCase()))
             .toList();
-        emit(HomeLoaded(allProducts: current.allProducts, filteredProducts: filtered));
+        emit(state.copyWith(filteredProducts: filtered));
       }
     }
   }

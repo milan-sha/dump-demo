@@ -1,19 +1,31 @@
-import '../product_categoryz_by_list/product_category.dart';
+part of 'category_cubit.dart';
 
-abstract class CategoryState {}
-
-class CategoryInitial extends CategoryState {}
-
-class CategoryLoading extends CategoryState {}
-
-class CategoryLoaded extends CategoryState {
+class CategoryState extends Equatable {
+  final CategoryStatus categoryStatus;
   final List<ProductCategory> categories;
+  final String? errorMessage;
 
-  CategoryLoaded(this.categories);
+  const CategoryState({
+    this.categoryStatus = CategoryStatus.initial,
+    this.categories = const [],
+    this.errorMessage,
+  });
+
+  CategoryState copyWith({
+    CategoryStatus? categoryStatus,
+    List<ProductCategory>? categories,
+    String? errorMessage,
+    bool clearErrorMessage = false,
+  }) {
+    return CategoryState(
+      categoryStatus: categoryStatus ?? this.categoryStatus,
+      categories: categories ?? this.categories,
+      errorMessage: clearErrorMessage ? null : (errorMessage ?? this.errorMessage),
+    );
+  }
+
+  @override
+  List<Object?> get props => [categoryStatus, categories, errorMessage];
 }
 
-class CategoryError extends CategoryState {
-  final String message;
-
-  CategoryError(this.message);
-}
+enum CategoryStatus { initial, loading, loaded, error }

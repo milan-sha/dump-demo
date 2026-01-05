@@ -1,52 +1,61 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'checkout_state.dart';
+
+part 'checkout_state.dart';
 
 class CheckoutCubit extends Cubit<CheckoutState> {
-  CheckoutCubit() : super(CheckoutInitial());
+  CheckoutCubit() : super(const CheckoutState());
 
-  DateTime? _startDateTime;
-  DateTime? _endDateTime;
-
-  DateTime? get startDateTime => _startDateTime;
-  DateTime? get endDateTime => _endDateTime;
+  DateTime? get startDateTime => state.startDateTime;
+  DateTime? get endDateTime => state.endDateTime;
 
   void setStartDateTime(DateTime dateTime) {
-    _startDateTime = dateTime;
-    _endDateTime = null;
-    emit(CheckoutInitial(startDateTime: _startDateTime, endDateTime: _endDateTime));
+    emit(state.copyWith(
+      startDateTime: dateTime,
+      clearEndDateTime: true,
+    ));
   }
 
   void setEndDateTime(DateTime dateTime) {
-    if (_startDateTime == null) {
-      emit(CheckoutFailure('Please select a Start Time first.'));
+    if (state.startDateTime == null) {
+      emit(state.copyWith(
+        checkoutStatus: CheckoutStatus.error,
+        errorMessage: 'Please select a Start Time first.',
+      ));
       return;
     }
 
-    final duration = dateTime.difference(_startDateTime!);
-    if (dateTime.isBefore(_startDateTime!)) {
-      emit(CheckoutFailure('End time cannot be before Start time.'));
+    final duration = dateTime.difference(state.startDateTime!);
+    if (dateTime.isBefore(state.startDateTime!)) {
+      emit(state.copyWith(
+        checkoutStatus: CheckoutStatus.error,
+        errorMessage: 'End time cannot be before Start time.',
+      ));
     } else if (duration.inHours >= 24) {
-      emit(CheckoutFailure('Delivery window cannot exceed 24 hours.'));
+      emit(state.copyWith(
+        checkoutStatus: CheckoutStatus.error,
+        errorMessage: 'Delivery window cannot exceed 24 hours.',
+      ));
     } else {
-      _endDateTime = dateTime;
-      emit(CheckoutInitial(startDateTime: _startDateTime, endDateTime: _endDateTime));
+      emit(state.copyWith(endDateTime: dateTime, clearErrorMessage: true));
     }
   }
 
   void processCheckout() {
-    if (_startDateTime == null || _endDateTime == null) {
-      emit(CheckoutFailure('Please select your delivery window.'));
+    if (state.startDateTime == null || state.endDateTime == null) {
+      emit(state.copyWith(
+        checkoutStatus: CheckoutStatus.error,
+        errorMessage: 'Please select your delivery window.',
+      ));
       return;
     }
-    emit(CheckoutProcessing());
+    emit(state.copyWith(checkoutStatus: CheckoutStatus.processing, clearErrorMessage: true));
     Future.delayed(const Duration(seconds: 1), () {
-      emit(CheckoutSuccess());
+      emit(state.copyWith(checkoutStatus: CheckoutStatus.success));
     });
   }
 
   void reset() {
-    _startDateTime = null;
-    _endDateTime = null;
-    emit(CheckoutInitial());
+    emit(const CheckoutState());
   }
 }

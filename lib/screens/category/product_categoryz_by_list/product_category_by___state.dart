@@ -1,17 +1,31 @@
-import '../../../models/hive_products.dart';
+part of 'product_category_by___cubit.dart';
 
-abstract class ProductListState {}
-
-class ProductListInitial extends ProductListState {}
-
-class ProductListLoading extends ProductListState {}
-
-class ProductListLoaded extends ProductListState {
+class ProductListState extends Equatable {
+  final ProductListStatus productListStatus;
   final List<Product> products;
-  ProductListLoaded(this.products);
+  final String? errorMessage;
+
+  const ProductListState({
+    this.productListStatus = ProductListStatus.initial,
+    this.products = const [],
+    this.errorMessage,
+  });
+
+  ProductListState copyWith({
+    ProductListStatus? productListStatus,
+    List<Product>? products,
+    String? errorMessage,
+    bool clearErrorMessage = false,
+  }) {
+    return ProductListState(
+      productListStatus: productListStatus ?? this.productListStatus,
+      products: products ?? this.products,
+      errorMessage: clearErrorMessage ? null : (errorMessage ?? this.errorMessage),
+    );
+  }
+
+  @override
+  List<Object?> get props => [productListStatus, products, errorMessage];
 }
 
-class ProductListError extends ProductListState {
-  final String message;
-  ProductListError(this.message);
-}
+enum ProductListStatus { initial, loading, loaded, error }

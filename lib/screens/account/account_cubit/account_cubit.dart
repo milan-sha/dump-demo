@@ -1,24 +1,29 @@
-// account_cubit.dart
+import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
-import 'account_state.dart';
+
+part 'account_state.dart';
 
 class AccountCubit extends Cubit<AccountState> {
-  AccountCubit() : super(AccountInitial());
+  AccountCubit() : super(const AccountState());
 
   Box? _userBox;
 
   Future<void> loadUserData() async {
     try {
       _userBox ??= Hive.box('userBox');
-      emit(AccountLoading());
+      emit(state.copyWith(accountStatus: AccountStatus.loading));
 
       String username = _userBox!.get('username', defaultValue: 'Guest') as String;
       String password = _userBox!.get('password', defaultValue: '****') as String;
 
-      emit(AccountLoaded(username: username, password: password));
+      emit(state.copyWith(
+        accountStatus: AccountStatus.loaded,
+        username: username,
+        password: password,
+      ));
     } catch (e) {
-      emit(AccountInitial());
+      emit(const AccountState());
     }
   }
 
@@ -27,9 +32,9 @@ class AccountCubit extends Cubit<AccountState> {
       if (_userBox != null) {
         await _userBox!.clear();
       }
-      emit(AccountLogout());
+      emit(state.copyWith(accountStatus: AccountStatus.logout));
     } catch (e) {
-      emit(AccountInitial());
+      emit(const AccountState());
     }
   }
 }

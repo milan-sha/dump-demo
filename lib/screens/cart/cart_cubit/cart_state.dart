@@ -1,11 +1,25 @@
-import '../cart.dart'; // Import where your CartItem class is defined
+part of 'cart_cubit.dart';
 
-abstract class CartState {}
 
-class CartInitial extends CartState {}
-
-class CartLoaded extends CartState {
+class CartState extends Equatable {
   final List<CartItem> items;
   final double subtotal;
-  CartLoaded({required this.items, required this.subtotal});
+
+  const CartState({
+    this.items = const [],
+    this.subtotal = 0.0,
+  });
+
+  CartState copyWith({
+    List<CartItem>? items,
+    double? subtotal,
+  }) {
+    return CartState(
+      items: items ?? this.items,
+      subtotal: subtotal ?? this.subtotal,
+    );
+  }
+
+  @override
+  List<Object?> get props => [items, subtotal];
 }
