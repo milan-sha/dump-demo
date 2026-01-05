@@ -78,7 +78,7 @@ class HomePage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.search_off, size: 64, color: Colors.grey),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16),
                           Text("No sneakers found.",
                               style: TextStyle(color: Colors.grey)),
                         ],
