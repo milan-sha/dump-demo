@@ -34,7 +34,14 @@ class CategoryScreen extends StatelessWidget {
                 ),
                 itemBuilder: (context, index) {
                   final category = state.categories[index];
-                  return _CategoryCard(category: category);
+                  return _CategoryCard(
+                    category: category,
+                    onTap: () {
+                      // Save selected category using addData
+                      context.read<CategoryCubit>().saveSelectedCategory(category.name);
+                      context.push('/category-products', extra: category.name);
+                    },
+                  );
                 },
               );
             }
@@ -53,12 +60,13 @@ class CategoryScreen extends StatelessWidget {
 
 class _CategoryCard extends StatelessWidget {
   final dynamic category;
-  const _CategoryCard({required this.category});
+  final VoidCallback? onTap;
+  const _CategoryCard({required this.category, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push('/category-products', extra: category.name),
+      onTap: onTap ?? () => context.push('/category-products', extra: category.name),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),

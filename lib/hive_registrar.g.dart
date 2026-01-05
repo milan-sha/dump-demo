@@ -4,7 +4,7 @@
 
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:dump/models/hive_products.dart';
-import 'package:dump/screens/products.dart';
+
 
 extension HiveRegistrar on HiveInterface {
   void registerAdapters() {

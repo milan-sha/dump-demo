@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:hive_ce_flutter/adapters.dart';
 import '../models/hive_products.dart';
 
+
 mixin class StorageServiceMixin {
   static late Box<Product> productBox;
   static late Box userBox;
@@ -34,9 +35,6 @@ mixin class StorageServiceMixin {
   }
   List<Product> getHiveProducts() => productBox.values.toList();
 }
-
-
-
 enum MainBoxKeys { category, product ,cartProducts }
 
 mixin class StoragesServiceMixin {

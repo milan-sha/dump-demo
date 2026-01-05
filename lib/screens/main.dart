@@ -3,12 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'cart/cart_cubit/cart_cubit.dart';
 import 'cart/cart_screen.dart';
 import 'cart/cart_cubit/cart_state.dart'; // Ensure this contains CartLoaded and items
+import 'category/category.dart';
 import 'home/home.dart';
-import ' category/category.dart';
 import 'account/account.dart';
-// Removed the 'hide' logic as it often causes confusion;
-// ensure HomeState and CartState classes are uniquely named.
-import 'home/home_cubit/home_state.dart' hide CartState;
 
 class MainScreen extends StatefulWidget {
   final Widget child;
@@ -46,7 +43,7 @@ class _MainScreenState extends State<MainScreen> {
               borderRadius: BorderRadius.circular(32),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 18,
                   offset: const Offset(0, 6),
                 )

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive_ce/hive_ce.dart';
 import '../../../models/hive_products.dart';
-import '../product_category.dart';
+import '../../../service/storage _service.dart';
+import '../product_categoryz_by_list/product_category.dart';
 import 'category_state.dart';
 
-class CategoryCubit extends Cubit<CategoryState> {
+class CategoryCubit extends Cubit<CategoryState> with StorageServiceMixin, StoragesServiceMixin {
   CategoryCubit() : super(CategoryInitial()) {
     loadCategories();
   }
@@ -14,8 +14,7 @@ class CategoryCubit extends Cubit<CategoryState> {
     emit(CategoryLoading());
 
     try {
-      var box = Hive.box<Product>('products');
-      List<Product> allProducts = box.values.toList();
+      List<Product> allProducts = getHiveProducts();
       final uniqueCategoryNames = allProducts.map((p) => p.category).toSet().toList();
       final categories = uniqueCategoryNames.map((name) {
         return ProductCategory(
@@ -28,10 +27,31 @@ class CategoryCubit extends Cubit<CategoryState> {
       if (categories.isEmpty) {
         emit(CategoryError('No categories found in the database.'));
       } else {
+        // Save categories using addData
+        await saveCategories(categories);
         emit(CategoryLoaded(categories));
       }
     } catch (e) {
       emit(CategoryError('Failed to sync categories: $e'));
+    }
+  }
+
+  Future<void> saveCategories(List<ProductCategory> categories) async {
+    try {
+      // Save the list of category names using addData
+      final categoryNames = categories.map((c) => c.name).toList();
+      await addData(MainBoxKeys.category, categoryNames);
+    } catch (e) {
+      // Handle error silently or log it
+    }
+  }
+
+  Future<void> saveSelectedCategory(String categoryName) async {
+    try {
+      // Save the selected category using addData
+      await addData(MainBoxKeys.category, categoryName);
+    } catch (e) {
+      // Handle error silently or log it
     }
   }
   Color _getCategoryColor(String name) {

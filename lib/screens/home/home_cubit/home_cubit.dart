@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../service/storage _service.dart';// Ensure no spaces in filename
-import '../../../models/hive_products.dart';
 import 'home_state.dart';
 
 class HomeCubit extends Cubit<HomeState> with StorageServiceMixin {

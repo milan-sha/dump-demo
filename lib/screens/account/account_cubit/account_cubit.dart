@@ -1,6 +1,6 @@
 // account_cubit.dart
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive_ce/hive_ce.dart';
+import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'account_state.dart';
 
 class AccountCubit extends Cubit<AccountState> {

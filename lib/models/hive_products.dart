@@ -1,4 +1,4 @@
-import 'package:hive_ce/hive_ce.dart';
+import 'package:hive_ce_flutter/hive_flutter.dart';
 
 part 'hive_products.g.dart';
 

@@ -1,21 +1,13 @@
-import 'package:dump/screens/cart/cart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/hive_products.dart';
-
-// Import the Cart Cubit and State
-import '../cart/cart_cubit/cart_cubit.dart';
 import 'home_cubit/home_cubit.dart';
 import 'home_cubit/home_state.dart';
-
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
-
   @override
   Widget build(BuildContext context) {
-    // Note: Usually BlocProvider is placed higher up (like in main.dart)
-    // but if you want it specifically here, this works.
     return BlocProvider(
       create: (context) => HomeCubit()..loadProducts(),
       child: Scaffold(
@@ -79,27 +71,9 @@ class HomePage extends StatelessWidget {
     );
   }
 }
-
 class ProductCard extends StatelessWidget {
   final Product product;
   const ProductCard({super.key, required this.product});
-
-  // FIXED: Logic moved to use CartCubit
-  void _handleAddToCart(BuildContext context) {
-    // Instead of manually editing a list, tell the Cubit to handle it
-    context.read<CartCubit>().addToCart(product as CartItem);
-
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${product.title} added to cart!'),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 1),
-        backgroundColor: Colors.blueAccent,
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -119,26 +93,10 @@ class ProductCard extends StatelessWidget {
                     color: Colors.white,
                     child: Image.asset(
                       product.assetPath,
+                      height: 150,
                       fit: BoxFit.contain,
                       errorBuilder: (context, error, stackTrace) =>
                       const Icon(Icons.broken_image, color: Colors.grey),
-                    ),
-                  ),
-                  // ADD TO CART BUTTON
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: GestureDetector(
-                      onTap: () => _handleAddToCart(context),
-                      child: Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: const BoxDecoration(
-                          color: Colors.blueAccent,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.add_shopping_cart,
-                            color: Colors.white, size: 18),
-                      ),
                     ),
                   ),
                 ],
