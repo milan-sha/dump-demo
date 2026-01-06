@@ -14,7 +14,10 @@ class LoginCubit extends Cubit<LoginState> {
   Future<void> login(String email, String password) async {
     emit(state.copyWith(loginStatus: LoginStatus.loading, clearErrorMessage: true));
     try {
-      final box = Hive.box('userBox');
+      // Open box if not already open, otherwise get existing box
+      final box = Hive.isBoxOpen('userBox') 
+          ? Hive.box('userBox')
+          : await Hive.openBox('userBox');
       await box.put('username', email);
       await box.put('password', password);
       emit(state.copyWith(loginStatus: LoginStatus.success));

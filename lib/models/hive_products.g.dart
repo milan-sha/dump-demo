@@ -1,5 +1,4 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-
 part of 'hive_products.dart';
 
 class ProductAdapter extends TypeAdapter<Product> {
@@ -18,32 +17,21 @@ class ProductAdapter extends TypeAdapter<Product> {
       description: fields[2] as String,
       price: (fields[3] as num).toDouble(),
       brand: fields[4] as String,
+      thumbnail: fields[5] as String, // Added
+      id: fields[6] as int,           // Added
     );
   }
 
   @override
   void write(BinaryWriter writer, Product obj) {
     writer
-      ..writeByte(5)
-      ..writeByte(0)
-      ..write(obj.category)
-      ..writeByte(1)
-      ..write(obj.title)
-      ..writeByte(2)
-      ..write(obj.description)
-      ..writeByte(3)
-      ..write(obj.price)
-      ..writeByte(4)
-      ..write(obj.brand);
+      ..writeByte(7) // Changed to 7
+      ..writeByte(0)..write(obj.category)
+      ..writeByte(1)..write(obj.title)
+      ..writeByte(2)..write(obj.description)
+      ..writeByte(3)..write(obj.price)
+      ..writeByte(4)..write(obj.brand)
+      ..writeByte(5)..write(obj.thumbnail) // Added
+      ..writeByte(6)..write(obj.id);        // Added
   }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ProductAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
 }

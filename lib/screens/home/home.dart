@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../models/hive_products.dart';
+import '../../models/product.dart';
 import 'home_cubit/home_cubit.dart';
 
 class HomePage extends StatelessWidget {
@@ -10,7 +10,6 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      // Automatically triggers product loading on startup
       create: (context) => HomeCubit()..loadProducts(),
       child: Scaffold(
         backgroundColor: Colors.white,
@@ -30,7 +29,7 @@ class HomePage extends StatelessWidget {
                 onChanged: (query) => context.read<HomeCubit>().filterProducts(query),
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.search),
-                  hintText: 'Search sneakers...',
+                  hintText: 'Search products...',
                   filled: true,
                   fillColor: Colors.grey[100],
                   border: OutlineInputBorder(
@@ -45,22 +44,18 @@ class HomePage extends StatelessWidget {
             Expanded(
               child: BlocBuilder<HomeCubit, HomeState>(
                 builder: (context, state) {
-                  // 1. Loading State
-                  if (state.homeStatus == HomeStatus.loading ||
-                      state.homeStatus == HomeStatus.initial) {
+                  if (state.homeStatus == HomeStatus.loading) {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  // 2. Error State
                   if (state.homeStatus == HomeStatus.error) {
                     return Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                          const SizedBox(height: 16),
-                          Text(state.errorMessage ?? "Something went wrong."),
-                          TextButton(
+                          Text(state.errorMessage ?? "An error occurred"),
+                          const SizedBox(height: 10),
+                          ElevatedButton(
                             onPressed: () => context.read<HomeCubit>().loadProducts(),
                             child: const Text("Retry"),
                           )
@@ -69,34 +64,26 @@ class HomePage extends StatelessWidget {
                     );
                   }
 
-                  // 3. Loaded State
-                  final products = state.filteredProducts;
-
-                  if (products.isEmpty) {
-                    return const Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.search_off, size: 64, color: Colors.grey),
-                          SizedBox(height: 16),
-                          Text("No sneakers found.",
-                              style: TextStyle(color: Colors.grey)),
-                        ],
-                      ),
-                    );
+                  if (state.filteredProducts.isEmpty) {
+                    return const Center(child: Text("No products found"));
                   }
 
-                  return GridView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 16,
-                      crossAxisSpacing: 16,
-                      mainAxisExtent: 280,
+                  return RefreshIndicator(
+                    onRefresh: () => context.read<HomeCubit>().loadProducts(),
+                    child: GridView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: 0.75,
+                      ),
+                      itemCount: state.filteredProducts.length,
+                      itemBuilder: (context, index) {
+                        final product = state.filteredProducts[index];
+                        return _ProductCard(product: product);
+                      },
                     ),
-                    itemCount: products.length,
-                    itemBuilder: (context, index) =>
-                        ProductCard(product: products[index]),
                   );
                 },
               ),
@@ -108,20 +95,15 @@ class HomePage extends StatelessWidget {
   }
 }
 
-// --- Product Card Widget Definition ---
-// Defining this here fixes the "Method not defined" error
-class ProductCard extends StatelessWidget {
+class _ProductCard extends StatelessWidget {
   final Product product;
-  const ProductCard({super.key, required this.product});
+  const _ProductCard({required this.product});
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-        side: BorderSide(color: Colors.grey[200]!),
-      ),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () => context.push('/product-detail', extra: product),
@@ -131,13 +113,24 @@ class ProductCard extends StatelessWidget {
             Expanded(
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(12),
                 color: Colors.grey[50],
-                child: Image.asset(
-                  product.assetPath,
-                  fit: BoxFit.contain,
+                // UPDATED: Using Image.network for API images
+                child: Image.network(
+                  product.thumbnail,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                            loadingProgress.expectedTotalBytes!
+                            : null,
+                      ),
+                    );
+                  },
                   errorBuilder: (context, error, stackTrace) =>
-                  const Icon(Icons.broken_image, color: Colors.grey),
+                  const Icon(Icons.broken_image, color: Colors.grey, size: 50),
                 ),
               ),
             ),
@@ -154,7 +147,12 @@ class ProductCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '₹${product.price.toStringAsFixed(0)}',
+                    product.brand,
+                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '\$${product.price.toStringAsFixed(2)}',
                     style: const TextStyle(
                       color: Colors.green,
                       fontWeight: FontWeight.w900,

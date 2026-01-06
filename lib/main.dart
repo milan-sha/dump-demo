@@ -1,15 +1,18 @@
 import 'package:dump/screens/cart/cart_cubit/cart_cubit.dart';
-import 'package:dump/service/storage _service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart'; // Required for BlocProvider
+import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'routes.dart';
 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize your storage and products
-  await StorageServiceMixin.initHive();
+  // Initialize Hive only for user data storage (not for products)
+  await Hive.initFlutter();
+  
+  // Open the userBox for login/account functionality
+  await Hive.openBox('userBox');
 
   runApp(const MyApp());
 }

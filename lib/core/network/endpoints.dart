@@ -7,7 +7,5 @@ class Endpoints {
    static const String smartphones = "products/category/smartphones";
    static const String carts = "carts";
    static const String cartUsers = "carts/user";
-  static const String authLogin = "auth/login'";
-  static const String authMe = "auth/me'";
-  static const String authRefresh = "auth/refresh'";
+
 }

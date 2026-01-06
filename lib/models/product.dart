@@ -1,23 +1,12 @@
-import 'package:hive_ce_flutter/hive_flutter.dart';
-
-part 'hive_products.g.dart';
-
-@HiveType(typeId: 1)
-class Product extends HiveObject {
-  @HiveField(0)
+class Product {
+  final int id;
   final String category;
-  @HiveField(1)
   final String title;
-  @HiveField(2)
   final String description;
-  @HiveField(3)
   final double price;
-  @HiveField(4)
   final String brand;
-  @HiveField(5)
-  final String thumbnail; // New Field
-  @HiveField(6)
-  final int id;           // New Field
+  final String thumbnail;
+  final List<String>? images;
 
   Product({
     required this.id,
@@ -27,6 +16,7 @@ class Product extends HiveObject {
     required this.price,
     required this.brand,
     required this.thumbnail,
+    this.images,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -35,9 +25,25 @@ class Product extends HiveObject {
       category: json['category'] ?? '',
       title: json['title'] ?? '',
       description: json['description'] ?? '',
-      price: (json['price'] as num).toDouble(),
+      price: (json['price'] as num?)?.toDouble() ?? 0.0,
       brand: json['brand'] ?? '',
       thumbnail: json['thumbnail'] ?? '',
+      images: json['images'] != null 
+          ? List<String>.from(json['images'] as List)
+          : null,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'category': category,
+      'title': title,
+      'description': description,
+      'price': price,
+      'brand': brand,
+      'thumbnail': thumbnail,
+      'images': images,
+    };
   }
 }

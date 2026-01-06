@@ -9,10 +9,11 @@ class CartCubit extends Cubit<CartState> {
 
   void addToCart(CartItem item) {
     final updatedItems = List<CartItem>.from(state.items);
-    final index = updatedItems.indexWhere((i) => i.name == item.name);
+    final index = updatedItems.indexWhere((i) => i.productId == item.productId);
 
     if (index >= 0) {
       updatedItems[index] = CartItem(
+        productId: item.productId,
         name: item.name,
         price: item.price,
         quantity: updatedItems[index].quantity + 1,
@@ -29,11 +30,12 @@ class CartCubit extends Cubit<CartState> {
 
   void removeOneFromCart(CartItem item) {
     final updatedItems = List<CartItem>.from(state.items);
-    final index = updatedItems.indexWhere((i) => i.name == item.name);
+    final index = updatedItems.indexWhere((i) => i.productId == item.productId);
 
     if (index >= 0) {
       if (updatedItems[index].quantity > 1) {
         updatedItems[index] = CartItem(
+          productId: item.productId,
           name: item.name,
           price: item.price,
           quantity: updatedItems[index].quantity - 1,

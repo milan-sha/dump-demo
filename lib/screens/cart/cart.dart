@@ -1,11 +1,13 @@
 import 'package:equatable/equatable.dart';
 
 class CartItem extends Equatable {
+  final int productId;
   final String name;
   final double price;
   final int quantity;
 
   const CartItem({
+    required this.productId,
     required this.name,
     required this.price,
     this.quantity = 1,
@@ -13,6 +15,7 @@ class CartItem extends Equatable {
 
   CartItem copyWith({int? quantity}) {
     return CartItem(
+      productId: productId,
       name: name,
       price: price,
       quantity: quantity ?? this.quantity,
@@ -20,5 +23,5 @@ class CartItem extends Equatable {
   }
 
   @override
-  List<Object?> get props => [name, price, quantity];
+  List<Object?> get props => [productId, name, price, quantity];
 }
