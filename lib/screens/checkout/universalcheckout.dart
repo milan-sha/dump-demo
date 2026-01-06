@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import '../cart/cart_cubit/cart_cubit.dart';
 import 'chekout_cubit/checkout_cubit.dart';
 
@@ -59,16 +58,6 @@ class _UniversalCheckoutState extends State<UniversalCheckout> {
     );
   }
 
-  Widget _scheduleTile({required String title, required String subtitle, required IconData icon, required VoidCallback onTap, bool isSelected = false, bool enabled = true}) {
-    return ListTile(
-      onTap: enabled ? onTap : null,
-      enabled: enabled,
-      leading: Icon(icon, color: isSelected ? Colors.blue : Colors.grey),
-      title: Text(title, style: TextStyle(fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
-      subtitle: Text(subtitle),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: isSelected ? Colors.blue : Colors.grey.shade300)),
-    );
-  }
 
   Widget _priceRow(String label, double amount, {bool isBold = false, bool isFree = false}) {
     return Row(
@@ -90,6 +79,19 @@ class _UniversalCheckoutState extends State<UniversalCheckout> {
   );
 
   void _confirmPayment(BuildContext context) {
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      return;
+    }
+
+    context.read<CheckoutCubit>().saveDetails(
+      name: _nameController.text.trim(),
+      email: _emailController.text.trim(),
+      phone: _phoneController.text.trim(),
+      address: _addressController.text.trim(),
+      items: widget.checkoutItems,
+      total: total,
+    );
+
     showModalBottomSheet(
       context: context,
       builder: (context) => Padding(
@@ -140,13 +142,8 @@ class _UniversalCheckoutState extends State<UniversalCheckout> {
                             _sectionTitle("Personal Details"),
                             _buildTextField(_nameController, "Full Name", Icons.person),
                             _buildTextField(_emailController, "Email", Icons.email),
-                            _sectionTitle("Delivery Window"),
-                            _scheduleTile(
-                              title: state.startDateTime == null ? "Select Start" : DateFormat('jm').format(state.startDateTime!),
-                              subtitle: "Earliest arrival",
-                              icon: Icons.access_time,
-                              onTap: () {}, // Add your picker logic
-                            ),
+                            _buildTextField(_phoneController, "Phone Number", Icons.phone, keyboardType: TextInputType.phone),
+                            _buildTextField(_addressController, "Address", Icons.home, maxLines: 3),
                             _sectionTitle("Order Summary"),
                             _priceRow("Grand Total", total, isBold: true),
                           ],

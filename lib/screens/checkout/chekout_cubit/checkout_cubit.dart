@@ -41,6 +41,25 @@ class CheckoutCubit extends Cubit<CheckoutState> {
     }
   }
 
+  void saveDetails({
+    required String name,
+    required String email,
+    required String phone,
+    required String address,
+    required List<dynamic> items,
+    required double total,
+  }) {
+    emit(state.copyWith(
+      name: name,
+      email: email,
+      phone: phone,
+      address: address,
+      items: items,
+      total: total,
+      clearErrorMessage: true,
+    ));
+  }
+
   void processCheckout() {
     if (state.startDateTime == null || state.endDateTime == null) {
       emit(state.copyWith(
@@ -49,6 +68,7 @@ class CheckoutCubit extends Cubit<CheckoutState> {
       ));
       return;
     }
+
     emit(state.copyWith(checkoutStatus: CheckoutStatus.processing, clearErrorMessage: true));
     Future.delayed(const Duration(seconds: 1), () {
       emit(state.copyWith(checkoutStatus: CheckoutStatus.success));

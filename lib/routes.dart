@@ -11,7 +11,7 @@ import 'screens/cart/cart.dart';
 import 'screens/login/login.dart';
 import 'screens/home/home.dart';
 import 'screens/category/category.dart';
-import 'screens/category/product_list_by_category.dart';
+import 'screens/category/product_list.dart';
 import 'screens/cart/cart_screen.dart';
 import 'screens/account/account.dart';
 import 'screens/product_details.dart';

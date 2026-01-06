@@ -13,11 +13,11 @@ class CartScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text("My Shopping Bag",
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.transparent,
+        title: const Text('Cart',
+            style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
         elevation: 0,
-        centerTitle: true,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
       ),
       body: BlocBuilder<CartCubit, CartState>(
         builder: (context, state) {
@@ -165,14 +165,10 @@ class CartScreen extends StatelessWidget {
         children: [
           Icon(Icons.shopping_basket_outlined, size: 100, color: Colors.grey[300]),
           const SizedBox(height: 20),
-          const Text("Your bag is empty",
+          const Text("Your Cart is empty",
               style: TextStyle(
                   fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey)),
           const SizedBox(height: 10),
-          TextButton(
-              onPressed: () => context.go('/home'),
-              child: const Text("Go Shopping")
-          )
         ],
       ),
     );

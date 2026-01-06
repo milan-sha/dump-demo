@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'account_cubit/account_cubit.dart';
+import '../cart/cart_cubit/cart_cubit.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -10,11 +11,13 @@ class AccountScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => AccountCubit()..loadUserData(),
-      child: BlocListener<AccountCubit, AccountState>(
+        child: BlocListener<AccountCubit, AccountState>(
         listenWhen: (previous, current) => previous.accountStatus != current.accountStatus,
         listener: (context, state) {
           // Check the enum status for navigation
           if (state.accountStatus == AccountStatus.logout) {
+            // Clear cart when logging out
+            context.read<CartCubit>().clearCart();
             context.go('/login');
           }
         },

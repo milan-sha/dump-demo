@@ -12,11 +12,9 @@ class AccountCubit extends Cubit<AccountState> {
   Future<void> loadUserData() async {
     try {
       // Open box if not already open, otherwise get existing box
-      if (_userBox == null) {
-        _userBox = Hive.isBoxOpen('userBox') 
+      _userBox ??= Hive.isBoxOpen('userBox')
             ? Hive.box('userBox')
             : await Hive.openBox('userBox');
-      }
       emit(state.copyWith(accountStatus: AccountStatus.loading));
 
       String username = _userBox!.get('username', defaultValue: 'Guest') as String;
